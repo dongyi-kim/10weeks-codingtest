@@ -20,7 +20,7 @@ public class Main{
         int p = scanner.nextInt();
         int q = scanner.nextInt();
         int answer = getMax(p, q);
-        System.out.println("%d\n", answer);
+        System.out.printf("%d\n", answer);
     }
 
 }
