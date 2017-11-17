@@ -7,7 +7,7 @@
 *.input
 *.output
 
-.git
+.vscode
 .idea
 
 # Prerequisites
