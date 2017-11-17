@@ -7,6 +7,9 @@
 *.input
 *.output
 
+.git
+.idea
+
 # Prerequisites
 *.d
 
