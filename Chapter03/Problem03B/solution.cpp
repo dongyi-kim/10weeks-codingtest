@@ -22,7 +22,6 @@ int main()
 
 	for (int i = 0; i < m; i++)
 	{
-		//[l, r]번 좌석을 c색으로 칠하는 명령 
 		int l, r, c;
 		scanf("%d %d %d", &l, &r, &c);
 		

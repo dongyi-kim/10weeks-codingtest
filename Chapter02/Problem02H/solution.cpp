@@ -8,11 +8,11 @@ void testCase(int caseIndex)
 
 	long long top = r;
 	long long totalPixels = 0;
-	for(long long x = 0; x < r ; x ++)
+	for (long long x = 0; x < r; x++)
 	{
-		while( x * x + top * top >= r * r )
+		while (x * x + top * top >= r * r)
 		{
-			top --;
+			top--;
 		}
 
 		long long height = top + 1;
@@ -28,7 +28,7 @@ int main()
 {
 	int caseNum;
 	scanf("%d", &caseNum);
-	for(int caseIndex = 0; caseIndex < caseNum; caseIndex++)
+	for (int caseIndex = 0; caseIndex < caseNum; caseIndex++)
 	{
 		testCase(caseIndex);
 	}
