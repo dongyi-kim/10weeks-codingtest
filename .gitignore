@@ -7,6 +7,8 @@
 *.input
 *.output
 
+gen.py
+
 .vscode
 .idea
 
