@@ -2,36 +2,32 @@ import java.util.Scanner;
 
 class Main {
 
-    static int H;
-
-    public static void main(String[] args) {
-
-        Scanner sc = new Scanner(System.in);
-        H = sc.nextInt();
-
-        int[] inputs = new int[100000];
-        for (int i = 0; i < H; i++) {
-            inputs[i] = sc.nextInt();
+    public static final Scanner scanner = new Scanner(System.in);
+    public static void main(String[] args)
+    {
+        int n = scanner.nextInt();
+        int[] data = new int[n];
+        for (int i = 0; i < n; i++) {
+            data[i] = scanner.nextInt();
         }
 
         int sum = 0;
-        for (int i = 0; i < H; i++) {
-            sum += inputs[i];
+        for (int i = 0; i < n; i++) {
+            sum += data[i];
         }
 
-        int min = 0;
-        for (int i = 0; i < H; i++) {
-            int mind = mabs(sum - inputs[min] * H);
-            int di = mabs(sum - inputs[i] * H);
-            if (di < mind) {
-                min = i;
+        int closest  = 0;
+        for (int i = 0; i < n; i++)
+        {
+            int md = Math.abs(data[closest] * n - sum);
+            int nd = Math.abs(data[i] * n - sum );
+            if( md > nd)
+            {
+                closest = i;
             }
         }
-        System.out.printf("%d %d", min + 1, inputs[min]);
+        
+        System.out.printf("%d %d", closest + 1, data[closest]);
     }
 
-    private static int mabs(int input) {
-        if (input >= 0) return input;
-        return -input;
-    }
 }
