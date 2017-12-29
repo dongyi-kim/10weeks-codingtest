@@ -1,6 +1,6 @@
 #include<cstdio>
 
-const int MOD = 1000000007;
+const int MOD = 100000000;
 const int MAX_N = 1000000;
 
 int main()
