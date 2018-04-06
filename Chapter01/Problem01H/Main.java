@@ -1,33 +1,49 @@
-import java.util.Scanner;
+import java.io.*;
+import java.lang.*;
+import java.util.*;
 
-class Main {
 
+public class Main {
     public static final Scanner scanner = new Scanner(System.in);
+    //public static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    //public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+
+    public static int findIndex(int[] data, int n)
+    {
+        int x = 0; //존재하지 않는 경우는 없으므로, 일단 0이라고 가정
+        int S = 0; //모든 데이터의 합
+
+        for(int i = 0 ; i < n ; i++)
+        {
+            S += data[i];
+        }
+
+        for(int i = 0 ; i < n ; i ++)
+        {
+            int dx = Math.abs(n * data[x] - S); //i까지의 원소들 중 평균과의 최소거리
+            int di = Math.abs(n * data[i] - S); //현재 원소와 평균과의 거리
+            if( di < dx )
+            {
+                x = i;
+            }
+        }
+
+        return x + 1; //실제 번호는 1부터 시작하므로 증가
+    }
+
     public static void main(String[] args)
     {
         int n = scanner.nextInt();
         int[] data = new int[n];
-        for (int i = 0; i < n; i++) {
+        for(int i = 0 ; i < n ; i++)
+        {
             data[i] = scanner.nextInt();
         }
 
-        int sum = 0;
-        for (int i = 0; i < n; i++) {
-            sum += data[i];
-        }
+        int answer = findIndex(data, n);
+        int index = answer - 1;
 
-        int closest  = 0;
-        for (int i = 0; i < n; i++)
-        {
-            int md = Math.abs(data[closest] * n - sum);
-            int nd = Math.abs(data[i] * n - sum );
-            if( md > nd)
-            {
-                closest = i;
-            }
-        }
-        
-        System.out.printf("%d %d", closest + 1, data[closest]);
+        System.out.printf("%d %d\n", answer, data[index]);
     }
 
 }

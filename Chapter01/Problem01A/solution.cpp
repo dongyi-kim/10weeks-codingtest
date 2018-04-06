@@ -7,7 +7,7 @@ int get_max(int a, int b)
         return a;
     }else{
         return b;
-    }
+    } 
 }
 
 int main()

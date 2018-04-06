@@ -1,4 +1,7 @@
 #include <cstdio>
+#include <stdio.h>
+
+
 using namespace std;
 
 const int MAX_N = 10000;
