@@ -12,7 +12,7 @@ public class Main {
      * @param n
      * @return
      */
-    public static boolean isContinuable(int[] data, int n)
+    public static boolean isConsecutive(int[] data, int n)
     {
         int maximum = data[0];
         int minimum = data[0];
@@ -45,7 +45,7 @@ public class Main {
             data[i] = scanner.nextInt();
         }
 
-        boolean result = isContinuable(data, n);
+        boolean result = isConsecutive(data, n);
 
         if(result)
         {

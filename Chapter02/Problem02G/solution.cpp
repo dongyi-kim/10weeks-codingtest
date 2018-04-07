@@ -1,26 +1,30 @@
 #include<cstdio>
+#include<iostream>
 
-const int MAX_N = 1000;
+using namespace std;
 
-void bubble_sort(int arr[], int length)
-{	
-	for (int i = 0; i < length; i++)
-	{   
-		int back = length - i - 1; 
-		int changed = 0;            
-		for (int j = 0; j < back; j++)
+
+void bubbleSort(int data[], int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		int negativeCount = 0;
+		for (int j = 0; j < n - 1 - i; j++)
 		{
-			if (arr[j] > arr[j + 1])
-			{   
-				int temp = arr[j];
-				arr[j] = arr[j + 1];
-				arr[j + 1] = temp;
+			//오름차순을 부정하는 쌍이 등장하며면
+			if (data[j] > data[j + 1])
+			{	//두 쌍의 자리를 변경한다
+				int temp = data[j];
+				data[j] = data[j + 1];
+				data[j + 1] = temp;
 
-				changed++;
+				//그리고 그런 쌍의 수를 기록한다
+				negativeCount += 1;
 			}
 		}
 
-		if (changed == 0)
+		//이 값이 0이라는 건? 이미 모두 정렬이 되었다는 것
+		if (negativeCount == 0)
 		{
 			break;
 		}
@@ -29,24 +33,28 @@ void bubble_sort(int arr[], int length)
 
 int main()
 {
-	int arr[MAX_N];
 	int n;
+	int* data;
 
 	scanf("%d", &n);
+	data = new int[n];
+
 	for (int i = 0; i < n; i++)
 	{
-		scanf("%d", &arr[i]);
+		scanf("%d", &data[i]);
 	}
 
-	bubble_sort(arr, n);
-
+	bubbleSort(data, n);
 
 	for (int i = 0; i < n; i++)
 	{
 		if (i > 0)
+		{
 			printf(" ");
-		printf("%d", arr[i]);
+		}
+		printf("%d", data[i]);
 	}
 
+	delete[] data;
 	return 0;
 }

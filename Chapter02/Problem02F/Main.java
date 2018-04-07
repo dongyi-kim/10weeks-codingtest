@@ -1,8 +1,3 @@
-package Chapter02.Problem02F;
-/**
- * 코드를 제출하기 전에 꼭!!! 위의 패키지 임포트 명령어를 제거해주세요!
- **/
-
 import java.io.*;
 import java.lang.*;
 import java.util.*;

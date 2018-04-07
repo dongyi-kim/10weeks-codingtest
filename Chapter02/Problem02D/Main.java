@@ -1,8 +1,3 @@
-package Chapter02.Problem02D;
-/**
- * 코드를 제출하기 전에 꼭!!! 위의 패키지 임포트 명령어를 제거해주세요!
- **/
-
 import java.io.*;
 import java.lang.*;
 import java.util.*;
@@ -15,7 +10,10 @@ public class Main {
         String s1 = scanner.next();
         String s2 = scanner.next();
 
-        int result = s1.compareTo(s2);
+        MyString mys1 = new MyString(s1);
+        MyString mys2 = new MyString(s2);
+
+        int result = mys1.compareTo(mys2);
 
         if( result < 0 )
         {
@@ -37,6 +35,14 @@ class MyString implements Comparable<MyString>
     public MyString(String original)
     {
         characters = original.toCharArray();
+    }
+    public MyString(char[] original)
+    {
+        characters = new char[original.length];
+        for(int i = 0; i < characters.length ; i++)
+        {
+            characters[i] = original[i];
+        }
     }
 
     /**

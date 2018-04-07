@@ -5,8 +5,6 @@ import java.util.*;
 
 public class Main {
     public static final Scanner scanner = new Scanner(System.in);
-    //public static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-    //public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
 
     /**
      * 주어진 범위의 최소값의 위치를 반환하는 함수
@@ -43,7 +41,6 @@ public class Main {
             data[minIndex] = data[i];
             data[i] = temp;
         }
-
     }
 
     public static void main(String[] args) throws Exception {

@@ -1,40 +1,45 @@
-#include <cstdio>
-#include <stdio.h>
-
+#include<stdio.h>
+#include<iostream>
 
 using namespace std;
 
-const int MAX_N = 10000;
-
-
-int get_max(int data[], int length)
+/**
+* 배열의 최대값을 계산하는 함수.
+*
+* @param data
+* @param n
+* @return data[0] ~ data[n-1]중 최대값.
+*/
+int getMax(int data[], int n)
 {
-	int max_value = data[0];
-	for (int i = 0; i < length; i++)
+	int answer = data[0];
+
+	for (int i = 0; i < n; i++)
 	{
-		if (max_value > data[i])
+		if (answer < data[i])
 		{
-			max_value = data[i];
+			answer = data[i];
 		}
 	}
 
-	return max_value;
+	return answer;
 }
 
-
-int main() {
+int main()
+{
 	int n;
-	int data[MAX_N];
+	int *data;
 
 	scanf("%d", &n);
-
+	data = new int[n];
 	for (int i = 0; i < n; i++)
 	{
 		scanf("%d", &data[i]);
 	}
 
-	int answer = get_max(data, n);
+	int answer = getMax(data, n);
 
 	printf("%d\n", answer);
+	delete[] data;
 	return 0;
 }

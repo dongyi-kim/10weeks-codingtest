@@ -1,53 +1,70 @@
-#include <cstdio>
-const int MAX_N = 1000;
+#include<cstdio>
+#include<iostream>
 
-int get_minimum_index(int data[], int begin, int end)
-{	
-	int answer = begin;
+using namespace std;
+
+
+/**
+* 주어진 범위의 최소값의 위치를 반환하는 함수
+* @param data  데이터 배열
+* @param n     배열의 크기
+* @param begin 탐색 할 가장 첫(왼쪽) 인덱스
+* @param end   탐색 할 가장 마지막(오른쪽) 인덱스
+* @return	   data[begin] ~ data[end] 중 가장 작은 원소의 인덱스
+*/
+int getMinIndexInRange(int data[], int n, int begin, int end)
+{
+	int index = begin; //일반 data[begin]이 가장 작다고 가정
 
 	for (int i = begin; i <= end; i++)
 	{
-		if (data[i] < data[answer])
+		if (data[index] > data[i])
 		{
-			answer = i;
+			index = i;
 		}
 	}
 
-	return answer;
+	return index;
 }
 
-void selection_sort(int data[], int length)
-{  
-	int n = length;
+void selectionSort(int data[], int n)
+{
 	for (int i = 0; i < n; i++)
-	{ 
+	{
+		//주어진 범위에서 가장 작은 원소의 위치를 찾는다.
+		int minIndex = getMinIndexInRange(data, n, i, n - 1);
 
-
-		int min_index = get_minimum_index(data, i, length - 1);
-
-
-		int temp = data[i];
-		data[i] = data[min_index];
-		data[min_index] = temp;
+		//두 숫자의 위치를 바꾼다.
+		int temp = data[minIndex];
+		data[minIndex] = data[i];
+		data[i] = temp;
 	}
 }
 
-int main() {
+int main()
+{
 	int n;
-	int data[MAX_N];
+	int* data;
+
 	scanf("%d", &n);
+	data = new int[n];
+
 	for (int i = 0; i < n; i++)
 	{
 		scanf("%d", &data[i]);
 	}
-	selection_sort(data, n);
+
+	selectionSort(data, n);
+	
 	for (int i = 0; i < n; i++)
 	{
 		if (i > 0)
-		{	
+		{
 			printf(" ");
 		}
 		printf("%d", data[i]);
 	}
+
+	delete[] data;
 	return 0;
 }

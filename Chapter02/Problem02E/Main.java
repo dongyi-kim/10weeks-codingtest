@@ -1,8 +1,3 @@
-package Chapter02.Problem02E;
-/**
- * 코드를 제출하기 전에 꼭!!! 위의 패키지 임포트 명령어를 제거해주세요!
- **/
-
 import java.io.*;
 import java.lang.*;
 import java.util.*;
@@ -11,6 +6,13 @@ import java.util.*;
 public class Main {
     public static final Scanner scanner = new Scanner(System.in);
 
+    /**
+    * 주어진 숫자가 소수인지 판별하는 함수 
+    *
+    * @param N 
+    * @return true   소수라면 
+    * @return false  소수가 아니라면
+    */
     public static boolean isPrime(int N)
     {
         if( N == 1) return false;   //1은 소수가 아니다
@@ -32,7 +34,6 @@ public class Main {
     {
         int n = scanner.nextInt();
         boolean result = isPrime(n);
-
 
         System.out.printf("Case #%d\n", caseIndex);
         if(result)

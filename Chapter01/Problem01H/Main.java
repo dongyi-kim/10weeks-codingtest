@@ -5,9 +5,16 @@ import java.util.*;
 
 public class Main {
     public static final Scanner scanner = new Scanner(System.in);
-    //public static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-    //public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
 
+
+    /**
+    * 평균과의 차가 가장 작은 데이터의 번호를 반환하는 함수
+    * 여러 가지라면 가장 빠른 번호를 반환한다.
+    *
+    * @param data 
+    * @param n 
+    * @return int  가장 평균과 가까운 데이터의 번호 (1번부터 시작)
+    */
     public static int findIndex(int[] data, int n)
     {
         int x = 0; //존재하지 않는 경우는 없으므로, 일단 0이라고 가정
