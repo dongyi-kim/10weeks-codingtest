@@ -1,46 +1,38 @@
-#include<cstdio>
+#include<iostream>
 
-const int MAX_N = 100000;
-
-int data[MAX_N + 1];
-long long rangeSum[MAX_N + 1];
-
+using namespace std;
 int main()
 {
+	int cards[100001];
+	int left[100001];
+	int right[100001];
+	long long sum[100001];
 	int n, m;
-
-	scanf("%d %d", &n, &m);
-
-	for (int i = 1; i <= n; i++)
+	
+	cin >> n >> m ;
+	sum[0] = 0;
+	for(int i = 1; i <= n ; i++)
 	{
-		scanf("%d", &data[i]);
+		cin >> cards[i];
+		sum[i] = sum[i-1] + cards[i];
 	}
-
-	rangeSum[0] = 0;
-	for (int i = 1; i <= n; i++)
+	
+	int maxi = 1;
+	for(int i = 1; i<= m ; i++)
 	{
-		rangeSum[i] = rangeSum[i - 1] + data[i];
-	}
-
-	int maxIndex = -1;
-	long long maxValue = -1;
-
-	for (int i = 0; i < m; i++)
-	{
-		int leftIndex;
-		int rightIndex;
-
-		scanf("%d %d", &leftIndex, &rightIndex);
-
-		long long sum = rangeSum[rightIndex] - rangeSum[leftIndex - 1];
+		cin >> left[i] >> right[i];
 		
-		if (sum > maxValue)
+		long long before = sum[right[maxi]] - sum[left[maxi]-1];
+		long long now = sum[right[i]] - sum[left[i]-1];
+		if(now > before)
 		{
-			maxValue = sum;
-			maxIndex = i + 1;
+			maxi = i;
 		}
+		
 	}
-
-	printf("%d %d\n", maxIndex, maxValue);
+	
+	cout << maxi << " " << sum[right[maxi]] - sum[left[maxi]-1];
+	
+	
 	return 0;
 }
