@@ -77,7 +77,6 @@ public class Main {
 
 		int answer = getFrequentNumber(data, n);
 
-		System.out.println(answer);
-
+		System.out.printf("%04d", answer);
 	}
 }
