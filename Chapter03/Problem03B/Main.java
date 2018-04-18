@@ -31,7 +31,7 @@ public class Main {
 //		for(int i = 0 ; i < n ; i ++)
 //		{
 //			seats[i] = 0;
-//		}
+//		} 
 
 		//색칠 정보들이 주어진 순서대로 각 좌석을 색칠(색상 대입)한다.
 		for(int i = 0 ; i < m ; i ++)
@@ -44,13 +44,13 @@ public class Main {
 			}
 		}
 
-		int minColor = seats[0]; //가장 적게 등장한 색상
-		int maxColor = seats[0]; //가장 많이 등장한 색상
-
 		//모든 색칠을 완료한 이후의 색상 정보를 사용하여
 		//모든 색상에 대한 빈도수 테이블을 계산한다
 		int[] table = new int[MAX_COLOR_NUMBER];
 		fillFrequencyTable(seats, n, table);
+		
+		int minColor = seats[0]; //가장 적게 등장한 색상
+		int maxColor = seats[0]; //가장 많이 등장한 색상
 
 		for(int color = 0 ; color <= 99; color += 1)
 		{
@@ -59,11 +59,11 @@ public class Main {
 			}
 			//한 번 이상 등장한 모든 색깔 color에 대하여
 
-			if(minColor == -1 || table[minColor] > table[color])
+			if(table[minColor] > table[color])
 			{ //가장 적게 등장한 색이 아직 없거나, color가 더 적게 등장한 경우
 				minColor = color;
 			}
-			if(maxColor == -1 || table[maxColor] < table[color])
+			if(table[maxColor] < table[color])
 			{ //가장 많이 등장한 색이 아직 없거나, color가 더 많이 등장한 경우
 				maxColor = color;
 			}

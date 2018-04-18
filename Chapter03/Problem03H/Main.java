@@ -21,18 +21,18 @@ public class Main {
 		Arrays.sort(cards);
 
 		for(int k : target)
-		{ // 모든 타겟 z에 대하여
+		{ // 모든 타겟 k에 대하여
 
 			boolean possible = false; // 두 수의 합으로 만들 수 있는지 여부
 
 			for(int x : cards)
 			{ // 모든 카드 중 하나인 x에 대하여
 
-				// x와 z가 상수이므로 y를 계산할 수 있다.
+				// x와 k가 상수이므로 y를 계산할 수 있다.
 				int y = k - x;
 
 				if(Arrays.binarySearch(cards, y) >= 0 )
-				{ //배열에 y가 존재한다 <==> x+y=z가 되는 <x, y>가 존재한다.
+				{  //배열에 y가 존재한다 <==> x+y=k가 되는 <x, y>가 존재한다.
 					//이를 표시하고 나간다.
 					possible = true;
 					break;

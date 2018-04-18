@@ -19,32 +19,42 @@ public class Main {
 		ArrayList<Integer> possibleTargets = new ArrayList<>(); //만들 수 있는 당첨번호들
 
 		// 두 카드의 합을 모두 저장한다.
-		ArrayList<Integer> twoSums = new ArrayList<>();
+		ArrayList<CardPair> pairs = new ArrayList<>();
 		for(int i = 0; i < n ; i ++)
 		{
 			for(int j = 0 ; j <= i; j++)
-			{
-				int sum = cards[i] + cards[j];
-				twoSums.add(sum);
+			{   // 모든 카드의 조합 <i, j>에 대하여, 두 카드를 짝지은 정보를 모두 저장한다
+				CardPair pair = new CardPair( cards[i], cards[j] );
+				pairs.add(pair);
 			}
 		}
 
 		// 바이너리 서치를 할 수 있도록 정렬한다.
-		Collections.sort(twoSums);
+		// 클래스 내에서 비교 연산자를 정의했기 때문에, 정렬할 수 있다.
+		Collections.sort(pairs);
 
 		for(int k : target)
-		{ // 검사해 볼 모든 k에 대하여
-
+		{ // 검사해 볼 모든 당첨 후보번호 k에 대하여
 			boolean possible = false;
-			for(int x : twoSums)
-			{ // k = ( p + q ) + ( r + s )라고할 때
-				// 두 수의 합 x = ( p + q )에 대하여
-				int y = k - x;  // y = (r + s) 라고 하자
+			for(CardPair knownPair : pairs)
+			{   // 임의의 두 카드 < p, q >를 나타내는 짝 knownPair에 대하여
+				int x = knownPair.sumOfCards; // x = ( p + q ) 라고 하자.
 
-				// 두 수의 합으로 y = (r + s) 또한 표현할 수 있다면
- 				if(Collections.binarySearch(twoSums, y) >= 0)
-				{ //k는 네 카드의 합으로 표현 가능하다
+				// 남은 두 카드를 r, s라고 한다면
+				// y = r + s라고 할 때 아래가 성립한다.
+				int y = k - x;
+				CardPair targetPair = new CardPair(y); //두 카드의 합이 y가 되는 짝이 있다고 가정하자
+
+				//그런 짝이 pairs에 존재한다는 말은?
+				//기존에 존재하던 cards[]의 두 카드의 합으로, y를 만들어낼 수 있다!
+				int pairIndex = Collections.binarySearch(pairs, targetPair);
+ 				if( pairIndex >= 0)
+				{   // 그러므로, k는 네 카드의 합으로 표현 가능하다
 					possible = true;
+
+					// 아래와 같이 어떤 네 카드가 선택되었는지도 알 수 있다!
+					//CardPair pair1 = knownPair;
+					//CardPair pair2 = pairs.get( pairIndex );
 					break;
 				}
 			}
@@ -96,5 +106,37 @@ public class Main {
 			}
 		}
 	}
-
 }
+
+
+class CardPair implements Comparable<CardPair>
+{   // 두 개의 카드 조합을 나타내는 클래스
+
+	int card1;
+	int card2;
+	int sumOfCards; //두 카드의 합
+
+	//두 카드의 정보를 알 때
+	CardPair(int card1, int card2)
+	{
+		this.card1 = card1;
+		this.card2 = card2;
+		this.sumOfCards = this.card1 + this.card2;
+	}
+
+	// 두 카드의 정보를 모르고 합만 알 때
+	CardPair(int sumOfCards)
+	{
+		this.sumOfCards = sumOfCards;
+		this.card1 = -1;
+		this.card2 = -1;
+	}
+
+	// 두 카드의 합으로 짝들의 대소 관계를 정의한다.
+	@Override
+	public int compareTo(CardPair o) {
+		return this.sumOfCards - o.sumOfCards;
+	}
+}
+
+

@@ -29,11 +29,12 @@ public class Main {
 	{
 		ArrayList<Integer> ret = new ArrayList<>();
 
-    //data에 대한 빈도수 테이블을 계산한다
+    	//data에 대한 빈도수 테이블을 계산한다
 		int[] table = new int [MAX_SERIAL_NUMBER+1];
 		fillFrequencyTable(data, n, table);
-
+		
 		for(int number = 1; number <= MAX_SERIAL_NUMBER; number += 1)
+		//or for(int number : data)
 		{ //존재할 수 있는 모든 시리얼 넘버에 대해 차례로 조회한다.
 
 			//전체 데이터에서 한 번만 등장한 number를 차례로 정답 리스트에 추가한다.
@@ -43,7 +44,7 @@ public class Main {
 			}
 		}
 
-    //오름차순 순서로 추가했기 때문에 ret에 대한 정렬은 불필요하다.
+		//오름차순 순서로 추가했기 때문에 ret에 대한 정렬은 불필요하다.
 		return ret;
 	}
 

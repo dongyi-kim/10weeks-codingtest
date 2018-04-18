@@ -1,80 +1,145 @@
-#include<cstdio>
-#include<algorithm>
 #include<vector>
-
+#include<algorithm>
+#include<iostream>
+#include<stdio.h>
 using namespace std;
 
-const int MAX_N = 100000;
+class CardPair{
+public:
+	// 두 개의 카드 조합을 나타내는 클래스
+	int card1;
+	int card2;
+	int sumOfCards; //두 카드의 합
 
-bool canMake(const vector<int> &arr, int n, int s)
-{
-	for (int i = 0; i < n; i++)
+	//두 카드의 정보를 알 때
+	CardPair(int sumOfCards = 0)
 	{
-		int x = arr[i];
-		int y = s - x;
-			
-		if (binary_search(arr.begin(), arr.end(), y) == true)
-		{
-			return true;
-		}	
+		this->card1 = -1;
+		this->card2 = -1;
+		this->sumOfCards = sumOfCards;
 	}
-	return false;
+
+	// 두 카드의 정보를 모르고 합만 알 때
+	CardPair(int card1, int card2)
+	{
+		this->card1 = card1;
+		this->card2 = card2;
+		this->sumOfCards = card1 + card1;
+	}
+
+	// 두 카드의 합으로 짝들의 대소 관계를 정의한다.
+	bool operator < (const CardPair &o) const{
+		return this->sumOfCards < o.sumOfCards;
+	}
+	bool operator == (const CardPair & o) const{
+		return this->sumOfCards == o.sumOfCards;
+	}
+};
+
+/**
+* 중복을 포함해 네 카드의 합으로 만들 수 있는 당첨번호들의 리스트를 반환하는 함수
+* @param n     카드의 수
+* @param m     검사하려는 당첨번호의 수
+* @param cards   각 카드에 적힌 숫자들
+* @param target  검사하려는 각 당첨번호 리스트
+* @return      네 카드의 합으로 표현될 수 있는 당첨번호들의 오름차순 리스트
+*/
+vector<int> getPossibleTargets(int n, int m, int* cards, int* targets)
+{
+	vector<int> possibleTargets; // 만들 수 있는 당첨 번호들
+	 
+	// 두 카드의 합을 모두 저장한다.
+	vector<CardPair> pairs;
+	for (int i = 0; i < n; i++){
+		for (int j = 0; j <= i; j++)
+		{	// 모든 카드의 조합 <i, j>에 대하여, 두 카드를 짝지은 정보를 모두 저장한다
+			CardPair pair = CardPair(cards[i] + cards[j]);
+			pairs.push_back(pair);
+		}
+	}
+
+	// 바이너리 서치를 할 수 있도록 정렬한다.
+	// 클래스 내에서 비교 연산자를 정의했기 때문에, 정렬할 수 있다.
+	sort(pairs.begin(), pairs.end());
+
+	for (int i = 0; i < m; i ++)
+	{	// 검사해 볼 모든 당첨 후보번호 k에 대하여
+		int k = targets[i];
+		bool possible = false;
+		for(int j = 0 ; j < pairs.size(); j+= 1)
+		{	// 임의의 두 카드 < p, q >를 나타내는 짝 knownPair에 대하여
+			CardPair knownPair = pairs[j];
+			int x = knownPair.sumOfCards; // x = ( p + q ) 라고 하자.
+
+			// 남은 두 카드를 r, s라고 한다면
+			// y = r + s라고 할 때 아래가 성립한다.
+			int y = k - x;
+			CardPair targetPair = CardPair(y);
+
+			//그런 짝이 pairs에 존재한다는 말은?
+			//기존에 존재하던 cards[]의 두 카드의 합으로, y를 만들어낼 수 있다!
+			if (binary_search(pairs.begin(), pairs.end(), targetPair) == true)
+			{	// 그러므로, k는 네 카드의 합으로 표현 가능하다
+				possible = true;
+
+				// 아래와 같이 어떤 네 카드가 선택되었는지도 알 수 있다!
+				// int pairIndex = lower_bound(pairs.begin(), pairs.end(), targetPair) - pairs.begin();
+				// CardPair pair1 = knownPair;
+				// CardPair pair2 = pairs[pairIndex];
+
+				break;
+			}
+		}
+		if (possible)
+		{
+			possibleTargets.push_back(k);
+		}
+	}
+
+	sort(possibleTargets.begin(), possibleTargets.end());
+
+	return possibleTargets;
 }
 
 int main()
 {
-	int n, m;
-	int data[MAX_N];
-
+	int n;	// 카드의 수 
+	int m;	// 검사 할 후보 당첨번호의 수 
 	scanf("%d %d", &n, &m);
+
+	int* cards = new int[n];
+	int* targets = new int[m];
+
+	// 각 카드 정보를 입력받는다
+	for (int i = 0; i < n; i++){
+		scanf("%d", &cards[i]);
+	}
+
+	// 각 후보 당첨번호를 입력받는다
+	for (int i = 0; i < m; i++){
+		scanf("%d", &targets[i]);
+	}
 	
-	for (int i = 0; i < n; i++)
-	{
-		scanf("%d", &data[i]);
-	}
+	vector<int> answers = getPossibleTargets(n, m, cards, targets);
 
-	vector<int> twoSums;
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = i; j < n; j++)
-		{
-			int twoSum = data[i] + data[j];
-			twoSums.push_back(twoSum);
-		}
-	}
-
-	sort(twoSums.begin(), twoSums.end());
-
-	vector<int> answer;
-	for (int i = 0; i < m; i++)
-	{
-		int s;
-		scanf("%d", &s);
-		
-		bool possible = canMake(twoSums, (int)twoSums.size(), s);
-
-		if (possible)
-		{
-			answer.push_back(s);
-		}
-	}
-
-	sort(answer.begin(), answer.end());
-
-	if (answer.size() == 0)
-	{
-		printf("NO\n");
+	if (answers.size() == 0)
+	{ // 가능한 당첨번호가 없다면 NO를 출력한다
+		printf("NO");
 	}
 	else
-	{
-		for (int i = 0; i < answer.size(); i++)
+	{ //가능한 당첨번호가 존재한다면 그 목록을 출력한다.
+		for (int i = 0; i < answers.size(); i++)
 		{
 			if (i > 0)
 			{
 				printf(" ");
 			}
-			printf("%d", answer[i]);
+			printf("%d", answers[i]);
 		}
 	}
+
+	delete[] cards;
+	delete[] targets;
+
 	return 0;
 }
