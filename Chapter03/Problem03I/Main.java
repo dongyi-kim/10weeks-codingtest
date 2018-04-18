@@ -45,7 +45,7 @@ public class Main {
 				}
 			}
 			if(possible)
-			{
+			{	// 세 카드의 합으로 k를 만들 수 있다면, 추가한다.
 				possibleTargets.add(k);
 			}
 		}

@@ -26,7 +26,7 @@ public class Main {
 			boolean possible = false; // 두 수의 합으로 만들 수 있는지 여부
 
 			for(int x : cards)
-			{ // 모든 카드 중 하나인 x에 대하여
+			{ 	// 모든 카드 중 하나인 x에 대하여
 
 				// x와 k가 상수이므로 y를 계산할 수 있다.
 				int y = k - x;
@@ -40,7 +40,7 @@ public class Main {
 			}
 
 			if(possible)
-			{ // z가 두 수의 조합으로 표현될 수 있다면,
+			{ 	// z가 두 수의 조합으로 표현될 수 있다면,
 				// 가능한 숫자의 갯수를 증가시킨다.
 				answer += 1;
 			}

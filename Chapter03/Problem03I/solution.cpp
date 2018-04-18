@@ -76,7 +76,7 @@ int main() {
 	vector<int> answers = getPossibleTargets(n, m, cards, targets);
 
 	if (answers.size() == 0)
-	{ // 가능한 당첨번호가 없다면 NO를 출력한다
+	{ 	// 가능한 당첨번호가 없다면 NO를 출력한다
 		printf("NO");
 	}
 	else
