@@ -73,4 +73,6 @@ int main() {
 	Range answer = getBestRange(n, m, cards, ranges);
 
 	printf("%d %lld\n", answer.index, answer.totalPoint);
+  
+  return 0;
 }

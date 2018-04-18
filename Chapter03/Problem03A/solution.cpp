@@ -27,15 +27,13 @@ void fillFrequencyTable(int data[], int n, int table[]) {
 * @return  가장 많이 등장한 번호. 여러개인 경우 사전순으로 가장 빠른 번호.
 */
 int getFrequentNumber(int data[], int n) {
-	int table[MAX_TABLE_LENGTH]; // 초기화 에 유의
-	for (int i = 0; i < MAX_TABLE_LENGTH; ++i) {
-		table[i] = 0;
-	}
-
-	fillFrequencyTable(data, n, table);
-
 	// 0000~9999 중에서 가장 많이 등장한 번호를 구해보자
 	int frequent_number = 0;
+
+	int table[MAX_TABLE_LENGTH]; // 초기화 에 유의
+	fillFrequencyTable(data, n, table);
+
+
 	for (int i = 0; i < MAX_TABLE_LENGTH; ++i) {
 		if (table[i] > table[frequent_number]) {
 			frequent_number = i;
