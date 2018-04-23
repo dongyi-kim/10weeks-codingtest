@@ -1,46 +1,55 @@
 #include<cstdio>
+#include<iostream>
+using namespace std;
 
-bool is_prime(int n)
+/**
+ * 주어진 숫자가 소수인지 판별하는 함수 
+ *
+ * @param N 
+ * @return true   소수라면 
+ * @return false  소수가 아니라면
+ */
+bool isPrime(int N)
 {
-	if (n <= 1)
-		return false;
+	if (N == 1) return false;   //1은 소수가 아니다
+	else if (N == 2) return true; //2는 소수다
+	else if (N % 2 == 0) return false; //나머지 짝수는 소수가 아니다
 
-	if (n == 2)
-		return true;
-
-	if (n % 2 == 0)
-		return false;
-
-	for (long long i = 3; i*i <= n; i += 2)
-	{
-		if (n % i == 0) {
+	for (int i = 3; i*i <= N; i += 2)
+	{   //모든 N미만의 홀수 자연수 i에 대해
+		if (N % i == 0)
+		{   //이 범위에 약수가 존재한다면 소수일 수 없다.
 			return false;
 		}
 	}
-
+	//약수가 하나도 존재하지 않았다면.
 	return true;
 }
-void test_case()
+
+void testcase(int caseIndex)
 {
 	int n;
 	scanf("%d", &n);
-	if (is_prime(n))
+
+	bool result = isPrime(n);
+
+	printf("Case #%d", caseIndex);
+	if (result)
 	{
 		printf("YES\n");
 	}
-	else
-	{
-		printf("NO\n");
+	else{
+		printf("YES\n");
 	}
 }
 
-int main() {
-	int tc;
-	scanf("%d", &tc);
-	for (int i = 1; i <= tc; i++)
+int main()
+{
+	int caseSize;
+	scanf("%d", &caseSize);
+	for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1)
 	{
-		printf("Case #%d\n", i);
-		test_case();
+		testcase(caseIndex);
 	}
 	return 0;
 }

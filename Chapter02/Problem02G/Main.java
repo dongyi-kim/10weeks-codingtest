@@ -1,46 +1,56 @@
-import java.util.Scanner;
+import java.io.*;
+import java.lang.*;
+import java.util.*;
+
 
 public class Main {
-    public static void main(String[] args) {
+    public static final Scanner scanner = new Scanner(System.in);
 
-        Scanner scanner = new Scanner(System.in);
-        int N = scanner.nextInt();
+    public static void bubbleSort(int[] data, int n)
+    {
+        for(int i = 0 ; i < n ; i++)
+        {
+            int negativeCount = 0;
+            for(int j = 0 ; j < n - 1-  i; j ++)
+            {
+                //오름차순을 부정하는 쌍이 등장하며면
+                if( data[j] > data[j+1] )
+                {   //두 쌍의 자리를 변경한다
+                    int temp = data[j];
+                    data[j] = data[j+1];
+                    data[j+1] = temp;
 
-        int input[] = new int[N];
-        for (int i = 0; i < N; i++) {
-            input[i] = scanner.nextInt();
-        }
-        bubbleSorting(input);
-
-        for (int i = 0; i < N; i++) {
-
-            if (i != N)
-                System.out.print(input[i] + " ");
-            else
-                System.out.print(input[i]);
-
-        }
-    }
-
-    private static void bubbleSorting(int[] a) {
-        int size = a.length;
-        for (int i = 0; i < size; i++) {
-            int cnt = 0;
-            for (int j = 0; j < size-i-1; j++) {
-                if(a[j] > a[j+1]){
-                    swap(a, j,j+1);
-                    cnt++;
+                    //그리고 그런 쌍의 수를 기록한다
+                    negativeCount += 1;
                 }
             }
-            if(cnt == 0){
+
+            //이 값이 0이라는 건? 이미 모두 정렬이 되었다는 것
+            if(negativeCount == 0)
+            {
                 break;
             }
         }
     }
 
-    private static void swap(int a[], int fromIndex, int toIndex) {
-        int temp = a[fromIndex];
-        a[fromIndex] = a[toIndex];
-        a[toIndex] = temp;
+    public static void main(String[] args) throws Exception {
+        int n = scanner.nextInt();
+        int[] data = new int[n];
+        for(int i = 0 ; i < n ; i++)
+        {
+            data[i] = scanner.nextInt();
+        }
+
+        bubbleSort(data, n);
+
+        for(int i = 0 ; i < n ; i++)
+        {
+            if( i > 0 )
+            {
+                System.out.print(" ");
+            }
+            System.out.print(data[i]);
+        }
     }
+
 }

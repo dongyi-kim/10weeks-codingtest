@@ -1,29 +1,41 @@
-#include<cstdio>
+#include<stdio.h>
+#include<iostream>
 
-const int MAX_N = 1000;
+using namespace std;
 
-int get_sum(int data[], int length)
-{
-	int sum = 0;
+/**
+* 정수 배열의 모든 원소의 합을 계산하는 함수
+*
+* @param data
+* @param n
+* @return data[0] ~ data[n-1]의 합
+*/
+int getSum(int data[], int n) {
+	int answer = 0;
 
-	for (int i = 0; i < length; i++)
+	for (int i = 0; i < n; i++)
 	{
-		sum = sum + data[i];
+		answer += data[i];
 	}
 
-	return sum;
+	return answer;
 }
 
-
-int main() {
+int main()
+{
 	int n;
-	int data[MAX_N];
+	int *data;
+
 	scanf("%d", &n);
+	data = new int[n];
 	for (int i = 0; i < n; i++)
 	{
 		scanf("%d", &data[i]);
 	}
-	int answer = get_sum(data, n);
+
+	int answer = getSum(data, n);
+
 	printf("%d\n", answer);
+	delete[] data;
 	return 0;
 }

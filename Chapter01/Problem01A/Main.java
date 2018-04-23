@@ -1,26 +1,32 @@
 import java.io.*;
+import java.lang.*;
 import java.util.*;
 
-
-public class Main{
+public class Main {
     public static final Scanner scanner = new Scanner(System.in);
 
-    //a와 b중 더 큰 수를 반환하는 함수
-    public static int getMax(int a, int b)
-    {
-        if( a >= b ){
+    /**
+     * 두 정수 a와 b중 더 큰 값을 반환하는 함수
+     *
+     * @param a
+     * @param b
+     * @return a와 b중 더 큰 값
+     */
+    public static int getMax(int a, int b) {
+        if (a > b) {
             return a;
-        }else{
+        } else {
             return b;
         }
     }
-    
-    public static void main(String[] args)
-    {
+
+    public static void main(String[] args) throws Exception {
         int p = scanner.nextInt();
         int q = scanner.nextInt();
+
         int answer = getMax(p, q);
-        System.out.printf("%d\n", answer);
+
+        System.out.println(answer);
     }
 
 }

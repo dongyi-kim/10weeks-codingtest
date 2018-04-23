@@ -1,53 +1,72 @@
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.io.*;
+import java.lang.*;
+import java.util.*;
 
-class Main {
 
-    static int N;
+public class Main {
+    public static final Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        N = scanner.nextInt();
-        ArrayList<Point> list = new ArrayList<>();
-        int count = 0;
-        for (int i = 0; i < N; i++) {
+    public static void main(String[] args)
+    {
+        int n = scanner.nextInt();
+        Point2D[] points = new Point2D[n];
 
-            list.add(new Point(scanner.nextInt(), scanner.nextInt()));
+        for(int i = 0 ; i < n ; i++)
+        {
+            int x=  scanner.nextInt();
+            int y=  scanner.nextInt();
+            points[i] = new Point2D(x, y);
         }
 
-        double min = Double.MAX_VALUE;
-        for (int i = 0; i < list.size(); i++) {
-            for (int j = i + 1; j < list.size(); j++) {
-                double distance = Point.distance(list.get(i), list.get(j));
-                if (min > distance) {
-                    min = distance;
+        int min_sqd = Integer.MAX_VALUE;
+        int min_cnt = 0;
+
+        for(int i = 0 ; i < n ; i ++)
+        {
+            for(int j = 0 ; j < i ; j++)
+            {
+                int sqd = points[i].getSquaredDistanceTo(points[j]);
+                if(sqd < min_sqd)
+                {
+                    min_sqd = sqd;
+                    min_cnt = 1;
+                }else if ( sqd == min_sqd)
+                {
+                    min_cnt ++;
                 }
             }
         }
-        System.out.println(min);
 
-        for (int i = 0; i < list.size(); i++) {
-            for (int j = i + 1; j < list.size(); j++) {
-                double distance = Point.distance(list.get(i), list.get(j));
-                if (min == distance) {
-                    count++;
-                }
-            }
-        }
-        System.out.println(count);
+        double distance = Math.sqrt(min_sqd);
+        System.out.printf("%.1f\n", distance);
+        System.out.println(min_cnt);
+    }
+}
+
+class Point2D{
+    int x;
+    int y;
+    public Point2D(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
     }
 
-    public static class Point {
-        int x, y;
+    /**
+     * 2차원 평면 상에서 점 this부터 점 target까지 거리의 제곱을 계산하는 함수
+     * @param target
+     * @return
+     */
+    public int getSquaredDistanceTo(Point2D target)
+    {
+        int dx = Math.abs(target.x - this.x);
+        int dy = Math.abs(target.y - this.y);
+        return dx * dx + dy * dy;
+    }
 
-        Point(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public static double distance(Point a, Point b) {
-            Double result = Math.sqrt(((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y)));
-            return Math.round(result * 100d) / 100d;
-        }
+    public double getDistanceTo(Point2D target)
+    {
+        double sqd = (double) this.getSquaredDistanceTo(target);
+        return Math.sqrt(sqd);
     }
 }

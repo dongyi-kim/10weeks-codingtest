@@ -1,34 +1,39 @@
-import java.util.*;
-import java.lang.*;
 import java.io.*;
+import java.lang.*;
+import java.util.*;
 
 
-class Main
-{
+public class Main {
     public static final Scanner scanner = new Scanner(System.in);
 
-    public static int getSum(int[] data)
-    {
-        int sum = 0;
+    /**
+     * 정수 배열의 모든 원소의 합을 계산하는 함수
+     *
+     * @param data
+     * @param n
+     * @return data[0] ~ data[n-1]의 합
+     */
+    public static int getSum(int[] data, int n) {
+        int answer = 0;
 
-        for(int i = 0 ; i < data.length ; i++)
+        for(int i = 0 ; i < n ; i++)
         {
-            sum += data[i];
+            answer += data[i];
         }
-        return sum;
+
+        return answer;
     }
-    
-    public static void main(String[] args)
-    {
+
+    public static void main(String[] args) throws Exception {
         int n = scanner.nextInt();
         int[] data = new int[n];
-        
-        for(int i = 0 ; i < n ; i ++)
-        {
+        for (int i = 0; i < n; i++) {
             data[i] = scanner.nextInt();
         }
-        
-        int answer = getSum(data);
+
+        int answer = getSum(data, n);
+
         System.out.println(answer);
     }
+
 }

@@ -1,12 +1,33 @@
-#include <cstdio>
+#include<cstdio>
+#include<iostream>
 
-int get_range_sum(int begin, int end)
-{
-	int answer = 0;
+using namespace std;
 
-	for (int i = begin; i <= end; i++)
+
+/**
+* 1부터 N까지의 자연수의 합을 계산하는 함수
+* @param i
+* @return
+*/
+int getRangeSumFromOne(int i) {
+	int sum = 0;
+
+	for (int j = 1; j <= i; j += 1)
 	{
-		answer += i;
+		sum += j;
+	}
+
+	return sum;
+}
+
+
+long long getAnswer(int N)
+{
+	long answer = 0;
+	for (int i = 1; i <= N; i++)
+	{
+		int rangeSum = getRangeSumFromOne(i);
+		answer += rangeSum;
 	}
 
 	return answer;
@@ -15,15 +36,12 @@ int get_range_sum(int begin, int end)
 int main()
 {
 	int n;
-	int answer = 0;
 
 	scanf("%d", &n);
 
-	for (int i = 1; i <= n; i++)
-	{
-		answer = answer + get_range_sum(1, i);
-	}
+	long long answer = getAnswer(n);
+	
+	printf("%lld\n", answer);
 
-	printf("%d\n", answer);
 	return 0;
 }

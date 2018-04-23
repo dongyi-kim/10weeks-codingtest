@@ -1,44 +1,59 @@
 #include<cstdio>
 #include<iostream>
 
-const int MAX_N = 100000;
-
 using namespace std;
 
-int get_rev(int arr[], int n)
+/**
+* 주어진 배열이 오름차순인지 검사하는 함수
+* @param data
+* @param n     데이터의 수
+* @return      data[0] ~ data[n-1]이 오름차순이라면 true, else false
+*/
+bool isOrdered(int data[], int n)
 {
-	int cnt = 0;
+	int count = 0; //오름차순을 부정하는 페어의 수 -> data[i] > data[i+1];
 
 	for (int i = 0; i + 1 < n; i++)
-	{	
-		if (arr[i] > arr[i + 1])
-		{	
-			cnt++;
+	{
+		if (data[i] > data[i + 1])
+		{
+			count += 1;
+			break;
 		}
 	}
 
-	return cnt;
+	if (count >= 1)
+	{
+		return false;
+	}
+	else{
+		return true;
+	}
 }
 
 int main()
 {
 	int n;
-	int data[MAX_N];
+	int* data;
 
-	scanf("%d %d %d", &n);
-	for (int i = 0; i < n; i++) {
+	scanf("%d", &n);
+	data = new int[n];
+
+	for (int i = 0; i < n; i++)
+	{
 		scanf("%d", &data[i]);
 	}
 
-	int revcnt = get_rev(data, n);
+	bool result = isOrdered(data, n);
 
-	if (revcnt == 0)
-	{	
-		printf("YES\n");
+	if (result)
+	{
+		printf("YES");
 	}
-	else
-	{	
-		printf("NO\n");
+	else{
+		printf("NO");
 	}
+
+	delete[] data;
 	return 0;
 }
