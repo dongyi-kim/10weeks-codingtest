@@ -69,5 +69,4 @@ class Point2D{
         double sqd = (double) this.getSquaredDistanceTo(target);
         return Math.sqrt(sqd);
     }
-
 }

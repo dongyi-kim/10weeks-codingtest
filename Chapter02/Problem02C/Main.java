@@ -22,7 +22,6 @@ public class Main {
                 countType += 1;
             }
         }
-
         return countType;
     }
 
