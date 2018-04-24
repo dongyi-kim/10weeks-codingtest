@@ -15,8 +15,8 @@ void fillFrequencyTable(int data[], int n, int table[]) {
     table[i] = 0;
   }
 	for (int i = 0; i < n; ++i) {
-    int number = dat[i];
-    table[number] += 1;
+		int number = dat[i];
+		table[number] += 1;
 	}
 }
 

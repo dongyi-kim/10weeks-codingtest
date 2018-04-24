@@ -16,12 +16,14 @@ public class Main {
 		int a = -1;
 		int b = -1;
 
+		// 두 수 p, q에 대해 소수 판별을 빠르게 하기 위해서
+		// 에라토스테네스의 체를 사용한다.
 		for(int p = 3; p <= x / 2; p += 2)
 		{   // p 보다 작은 모든 홀수 p에 대하여
 			int q = x - p; // x = p + q가 되는 q가 결정적으로 정해진다
 
 			// p와 q가 모두 소수라면?
-			if(sieve.isPrime[p] && sieve.isPrime[q])
+			if(sieve.isPrimeNumber(p) && sieve.isPrimeNumber(q))
 			{   // x = p + q가 되는 두 홀수 소수 <p, q>가 존재한다
 				a = p;
 				b = q;
@@ -48,7 +50,7 @@ public class Main {
 	}
 }
 
-class Sieve //소인수 분해를 빠르게
+class Sieve
 {
 	final int maximumValue;
 	final boolean[] isPrime;
