@@ -14,6 +14,7 @@ public class Main {
 	 * @return
 	 */
 	public static boolean isValidParentheses(int n, Parenthesis[] parentheses) {
+		// 현재 짝을 찾지 못한 열린 괄호들
 		Stack<Parenthesis> stack = new Stack<>();
 
 		for (int i = 0; i < n; i++) {
