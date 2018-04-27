@@ -19,8 +19,10 @@ public class Main {
 
 		for (int i = 0; i < m; i++) {
 			int userId = ids[i];
-			int ticketIndex = table.findEmptyIndexByUserId(userId);
-			tickets.add(ticketIndex);
+			// 사용할 수 있는 티켓 번호를 찾는다 
+			int ticketIndex = table.findEmptyIndexByUserId(userId); 
+			// 해당 티켓 번호를 사용하는 것으로 등록한다 
+			tickets.add(ticketIndex);		
 			table.setUsed(ticketIndex, true);
 		}
 		return tickets;
