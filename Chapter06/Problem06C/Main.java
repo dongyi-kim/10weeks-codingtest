@@ -34,13 +34,16 @@ public class Main {
 
 			// 이전에 확장중이던 히스토그램들 중, h보다 높이가 높은 히스토그램들은
 			// 더 이상 확장될 수 없다 => 최대 넓이가 결정된다.
-			while ( continuedHistograms.isEmpty() == false
-					&& continuedHistograms.peek().height > h.height ){
+			while ( continuedHistograms.size() > 1
+					&& continuedHistograms.peek().height >= h.height ){
 				// 확장중이던 히스토그램
 				Histogram lh = continuedHistograms.pop();
 
+				// 그 이전의 히스토그램 (왼쪽 확장의 끝)
+				Histogram bh = continuedHistograms.peek();
+
 				// 현재 추가된 h의 바로 왼쪽까지 확장중이었다.
-				long width = Math.abs(h.leftX - lh.leftX);
+				long width = Math.abs(h.leftX - bh.rightX);
 				long height = lh.height;
 				long area =  width * height;
 
