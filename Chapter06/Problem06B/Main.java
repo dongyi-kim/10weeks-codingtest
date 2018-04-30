@@ -1,9 +1,17 @@
+package Chapter06.Problem06B;
+/**
+ * 코드를 제출하기 전에 꼭!!! 위의 패키지 임포트 명령어를 제거해주세요!
+ **/
+
 import java.io.*;
 import java.lang.*;
 import java.util.*;
 
+
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
+	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+
 
 	/**
 	 * 파라미터로 주어지는 각 타워들에 대해 타겟 타워를 계산하는 함수
@@ -53,17 +61,19 @@ public class Main {
 
 		for(int i = 0 ; i < n; i ++) {
 			if(i > 0 ){
-				System.out.print(" ");
+				writer.write(" ");
 			}
 
 			Tower t = towers[i];
 			if(t.getTargetTower() == null){
-				System.out.print("0");
+				writer.write("0");
 			}else{
 				int targetIndex = t.getTargetTower().index;
-				System.out.print(targetIndex);
+				writer.write(String.valueOf(targetIndex));
 			}
 		}
+		writer.flush();
+		writer.close();
 	}
 
 }
