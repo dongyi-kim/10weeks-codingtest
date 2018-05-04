@@ -26,7 +26,7 @@ public class Main {
 
 		for(int i = 0 ; i < n ; i++){
 			// (m-1)명의 사람을 건너뛴다.
-			int jump = m % playerQueue.size();
+			int jump = 1 + (m-1) % playerQueue.size();
 			for(int j = 0; j<jump - 1; j+=1){
 				Player p = playerQueue.poll();
 				playerQueue.add(p);
@@ -42,7 +42,7 @@ public class Main {
 		return deadPlayers;
 	}
 
-	public static void testCase(int caseIndex) {
+	public static void testCase(int caseIndex) throws Exception{
 		int n = scanner.nextInt();
 		int m = scanner.nextInt();
 
@@ -54,15 +54,19 @@ public class Main {
 
 		ArrayList<Player> deadPlayers = getDeadPlayersList(n,m, players);
 
+		// 출력속도 개선을 위해 StringBuilder를 사용한다.
+		// 하나의 테스트케이스에 대한 출력(한 줄)을 스트링 빌더로 만든다
+		StringBuilder builder = new StringBuilder();
 		for(int i = 0 ; i < n ; i ++){
 			if( i > 0 ){
-				System.out.print(" ");
+				builder.append(" ");
 			}
 
 			Player p = deadPlayers.get(i);
-			System.out.print(p.index);
+			builder.append(p.index);
 		}
-		System.out.println();
+		// 정답을 출력한다
+		System.out.println(builder.toString());
 	}
 
 	public static void main(String[] args) throws Exception {

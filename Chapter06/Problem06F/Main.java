@@ -65,15 +65,19 @@ public class Main {
 		if (orders == null) {
 			writer.write("NO\n");
 		} else {
+			// 출력이 길 수 있으므로 StringBuilder를 사용해 한 줄의 출력 결과를 완성한다
+			StringBuilder outputBuilder = new StringBuilder();
 			for (int i = 0; i < n; i++) {
 				Bomb b = orders.get(i);
 
 				if (i > 0) {
-					writer.write(" ");
+					outputBuilder.append(" ");
 				}
-				writer.write(String.valueOf(b.index + 1));
+				outputBuilder.append(b.index + 1);
 			}
-			writer.write("\n");
+			outputBuilder.append("\n");
+			// 정답을 출력한다
+			writer.write(outputBuilder.toString());
 		}
 	}
 
