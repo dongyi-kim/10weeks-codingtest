@@ -7,24 +7,34 @@ public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
 
-	public static void testCase(int caseIndex) throws Exception{
+	public static void testCase(int caseIndex) throws Exception {
 		int N = scanner.nextInt();
 
 		int[][] map = new int[N][N];
 
 		Robot robot = new Robot();
 
-		for(int i = 1 ; i <= N * N ; i+= 1){
-			Position2D curPos = robot.getPosition();
-			Position2D nextPos = robot.getNextPosition();
+		int index = 0;
+		int lastIndex = N * N;
+		for (int level = 1; index < lastIndex; level += 1) {
+			for (int phase = 0; phase < 3; phase += 1) {
+				int steps = level;
+				if (phase == 0) {
+					steps = 1;
+				}
 
-			map[curPos.r][curPos.c] = i;
+				for (int s = 0; s < steps && index < lastIndex; s += 1) {
+					index += 1;
+					Position2D curPos = robot.getPosition();
+					map[curPos.r][curPos.c] = index;
+					robot.goStraight();
+				}
 
-			if(nextPos.r < 0 || nextPos.c < 0 || nextPos.r >= N || nextPos.c >= N || map[nextPos.r][nextPos.c] >= 1){
-				robot.turnRight();
+
+				robot.turnNext();
 			}
-			robot.goStraight();
 		}
+
 
 		printMap(map, N);
 	}
@@ -42,7 +52,6 @@ public class Main {
 		writer.flush();
 	}
 
-
 	public static void main(String[] args) throws Exception {
 		int caseSize = scanner.nextInt();
 
@@ -56,27 +65,27 @@ public class Main {
 
 }
 
-class Robot{
-	public static final int[] deltaR = new int[]{ 0, 1, 0, -1 };
-	public static final int[] deltaC = new int[]{ 1, 0, -1, 0 };
+class Robot {
+	public static final int[] deltaR = new int[]{0, 1, 0, 1, 0, -1};
+	public static final int[] deltaC = new int[]{1, 0, -1, 0, 1, 0};
 
 	private int direction;
 	private Position2D position;
 
-	public Robot(){
-		this.position = new Position2D(0,0);
+	public Robot() {
+		this.position = new Position2D(0, 0);
 		this.direction = 0;
 	}
 
-	public void goStraight(){
+	public void goStraight() {
 		this.position = getNextPosition();
 	}
 
-	public Position2D getNextPosition(){
+	public Position2D getNextPosition() {
 		int newR = position.r + deltaR[direction];
 		int newC = position.c + deltaC[direction];
 
-		Position2D newPosition = new Position2D( newR, newC );
+		Position2D newPosition = new Position2D(newR, newC);
 		return newPosition;
 	}
 
@@ -84,16 +93,16 @@ class Robot{
 		return this.position;
 	}
 
-
-	public void turnRight(){
-		this.direction = (this.direction+1)%4;
+	public void turnNext(){
+		this.direction = (this.direction + 1) % deltaC.length;
 	}
 }
 
-class Position2D{
+class Position2D {
 	public final int r;
 	public final int c;
-	public Position2D(int r, int c){
+
+	public Position2D(int r, int c) {
 		this.r = r;
 		this.c = c;
 	}
