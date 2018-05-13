@@ -40,8 +40,7 @@ public class Main {
 		return move;
 	}
 
-
-	public static void testCase(int caseIndex) {
+	public static void main(String[] args) throws Exception {
 		int N = scanner.nextInt();
 
 		Stack<Disk> A = new Stack<>();
@@ -57,15 +56,6 @@ public class Main {
 		int answer = getMinimumMove(N, A, B, C);
 
 		System.out.println(answer);
-	}
-
-	public static void main(String[] args) throws Exception {
-		int caseSize = scanner.nextInt();
-
-		for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1) {
-			testCase(caseIndex);
-		}
-
 	}
 }
 
