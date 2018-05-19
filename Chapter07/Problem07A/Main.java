@@ -20,8 +20,8 @@ public class Main {
 		// depth가 제한보다 커진 경우, limit개 만큼의 문자를 모두 선택했다는 뜻이다
 		if (depth > limit) {
 			// 선택한 문자들을 차례로 한 줄에 출력한다
-			for (int i = 0; i < depth; i += 1) {
-				int index = selectedIndex.get(i);
+			for (int i = 1; i < depth; i += 1) {
+				int index = selectedIndex.get(i - 1);
 				char c = ITEMS[index];
 				writer.write(String.valueOf(c));
 			}
