@@ -1,58 +1,88 @@
-#include<cstdio>
-#include<queue>
+#include <iostream>
+#include <vector>
+#include <queue>
 
 using namespace std;
 
 
+class Player{
+public:
+	int index;
 
+	Player(int index){
+		this->index = index;
+	}
+};
 
-void test_case()
-{
-	int n;	//초기 사람의 수 
-	int m;	//사을 제외할 간격 
-	scanf("%d %d", &n, &m);
-	
-	//모든 사람을 차례로 큐에 삽입한다 
-	queue<int> q;
-	for(int i = 1 ; i <= n ; i ++)
-	{
-		q.push(i);
+/**
+ * 조세퍼스 게임을 수행하여 각 플레이어가 제거된 순서를 리스트로 반환하는 함수
+ *
+ * @param n         플레이어의 수
+ * @param m         매 턴마다 건너 뛸 사람의 수
+ * @param players   좌석에 앉아있는 순서대로 주어지는 플레이어 정보
+ * @return
+ */
+vector<Player> getDeadPlayersList(int n, int m, const vector<Player>& players){
+	// 현재 게임에서 제외된 플레이어들의 리스트
+	vector<Player> deadPlayers;
+
+	// 아직 게임에서 제외되지 않는 플레이어들의 리스트
+	queue<Player> playerQueue;
+
+	for(int i = 0 ; i < n; i+= 1) {
+		playerQueue.push(players[i]);
 	}
 
-	//총 N번에 걸쳐 규칙에 맞게 사람을 제외해나간다 
-	for(int i = 0 ; i < n ; i ++)
-	{   //i번째에 제외 될 사람을 선정
-
-		//어차피 현재 남아있는 수 만큼 한 바퀴 조회하는 건 무의미하므로 나머지만큼만 조회하여 시간을 절약한다 
-		int length = m % q.size(); // length < q.size();
-
-		//제외되지 않을 사람은 큐의 앞에서 제거하여 가장 뒤로 보낸다 
-		for(int j = 1 ; j < length ; j ++)
-		{   
-			int next = q.front();
-			q.pop();
-			q.push(next);
+	for(int i = 0; i < n; i++) {
+		// (m-1)명의 사람을 건너뛴다.
+		int jump = 1 + (m - 1) % playerQueue.size();
+		for(int j = 0; j < jump - 1; j += 1) {
+			Player p = playerQueue.front();
+			playerQueue.pop();
+			playerQueue.push(p);
 		}
 
-		//이후 큐의 가장 앞에 남아있는 사람이 제외될 대상이다 
-		int target = q.front();
-		q.pop();
+		// m번째 사람은 게임에서 제외한다.
+		Player dead = playerQueue.front();
+		playerQueue.pop();
 
-		//제외하고 출력한다
-		printf("%d ", target);
+		// 제외 리스트에 추가한다.
+		deadPlayers.push_back(dead);
 	}
-	printf("\n");
+
+
+	return deadPlayers;
 }
 
+void process(int caseIndex) {
+	int n, m;
+	cin >> n >> m;
 
-int main()
-{	//각 테스트케이스 반복 
-	int tc;
-	scanf("%d", &tc);
-	for(int i = 0 ; i < tc ; i++)
-	{
-		test_case();
+	vector<Player> players;
+	for(int i = 0; i < n; i++) {
+		players.push_back(Player(i + 1));
 	}
-	return 0;
+
+	vector<Player> deadPlayers = getDeadPlayersList(n, m, players);
+
+	for(int i = 0; i < n; i ++) {
+		if(i > 0) {
+			cout << " ";
+		}
+
+		Player p = deadPlayers[i];
+		cout << p.index;
+	}
+
+	cout << endl;
+}
+
+int main() {
+	int caseSize;
+	cin >> caseSize;
+
+	for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1) {
+		process(caseIndex);
+	}
 }
 
