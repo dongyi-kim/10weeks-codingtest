@@ -46,7 +46,7 @@ public:
 
 	int getNumberOfConnectedNodes(int u) {
 		int uBoss = getGroupBoss(u);
-		return this.groupSize[uBoss];
+		return this->groupSize[uBoss];
 	}
 };
 
