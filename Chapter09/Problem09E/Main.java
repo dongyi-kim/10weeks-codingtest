@@ -1,4 +1,3 @@
-import java.io.*;
 import java.lang.*;
 import java.util.*;
 
@@ -7,17 +6,25 @@ public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 
 	public static Edge[] getMinimumSpanningTree(int V, int E, Edge[] edges){
+		// 트리는 항상 V-1개의 간선이 있다.
 		Edge[] spanningTree = new Edge[V-1];
 
+		// 빈 그래프 G에 대한 disjointSet을 선언한다
 		DisjointSet disjointSet = new DisjointSet(V);
+
+		// 간선들을 오름차순으로 정렬한다
 		Arrays.sort(edges);
 
 		int mstIndex = 0;
 		for(Edge e : edges){
+			// 모든 간선 e에 대해
 			if(disjointSet.find(e.nodeU) == disjointSet.find(e.nodeV)){
+				// 이미 해당 두 정점이 연결성이 존재한다면 이 간선은 무시한다.
 				continue;
 			}else{
+				// 그렇지 않다면 이 간선을 그래프 G에 추가한다.
 				spanningTree[mstIndex ++] = e;
+				disjointSet.union(e.nodeU, e.nodeV);
 			}
 		}
 
