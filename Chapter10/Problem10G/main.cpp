@@ -35,7 +35,7 @@ public:
 		int caseA = f(lastIndexA - 1, lastIndexB);	// A[i]를 제외하고 계산한 LCS
 		int caseB = f(lastIndexA, lastIndexB - 1);	// B[j]를 제외하고 계산한 LCS
 		int caseC = f(lastIndexA - 1, lastIndexB - 1);	// A[i], B[j]를 모두 제외하고 계산한 LCS
-		if (A[lastIndexA] == B[lastIndexB]) {
+		if (strA[lastIndexA] == strB[lastIndexB]) {
 			caseC += 1;		// 만약 A[i], B[j]가 일치한다면 LCS길이 + 1
 		}
 
