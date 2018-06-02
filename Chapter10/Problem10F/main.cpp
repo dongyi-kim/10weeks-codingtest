@@ -37,7 +37,7 @@ public:
 		}
 
 		// 일단 현재 픽셀의 차이값을 계산한다
-		int diff = imageA[lastRow][lastCol] - imageB[lastRow][lastCol];
+		int diff = imgA[lastRow][lastCol] - imgB[lastRow][lastCol];
 		int error = diff * diff;
 
 		// 이전 행 까지의 세가지 경우의 수중 최적해와 더한다
