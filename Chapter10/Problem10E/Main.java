@@ -68,12 +68,12 @@ class RangeSum {
 			return values[0][0];
 		}
 
-		int totalSum
+		memo[lastRow][lastCol]
 				= values[lastRow][lastCol]
 				+ f(lastRow - 1, lastCol)
 				+ f(lastRow, lastCol - 1)
 				- f(lastRow - 1, lastCol - 1);
 
-		return totalSum;
+		return memo[lastRow][lastCol];
 	}
 }
