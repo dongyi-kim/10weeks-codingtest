@@ -62,13 +62,16 @@ class DTW {
 		} else if (memo[lastIndexA][lastIndexB] != EMPTY) {
 			return memo[lastIndexA][lastIndexB];
 		} else if (lastIndexA == 0 && lastIndexB == 0) {
+			// 시점이 하나씩 밖에 없는 경우 서로 대응된다 
 			int diff = signA[0] - signB[0];
 			return diff * diff;
 		}
 
+		// 해당 두 시점의 차이 값 
 		int diff = signA[lastIndexA] - signB[lastIndexB];
 		int error = diff * diff;
 
+		// 해당 두 시점 이전 시점들의 대응들에 대한 최적해와 더한다
 		int answer = error + MIN(
 				f(lastIndexA - 1, lastIndexB),
 				f(lastIndexA, lastIndexB - 1),
