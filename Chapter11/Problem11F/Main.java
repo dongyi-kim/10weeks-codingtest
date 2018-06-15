@@ -23,64 +23,113 @@ public class Main {
 	}
 }
 
-class Solution{
-	public static final int ITERATION = 100;
+class Solution {
+	public static final int ITERATION = 100;    //karger's algorithm의 반복 횟수
 
-	public static int getMinimumCut(int N, int M, Edge[] edges){
+	/**
+	 * 그래프를 두 개의 그룹으로 나누기 위해 제거해야할 최소의 간선 수를 계산하는 함수
+	 *
+	 * @param N     정점의 수
+	 * @param M     간선의 수
+	 * @param edges 전체 간선의 집합
+	 * @return
+	 */
+	public static int getMinimumCut(int N, int M, Edge[] edges) {
 		int minCut = Integer.MAX_VALUE;
-		for(int i = 0 ; i < ITERATION ; i += 1){
+		// 여러 번 임의의 cut을 구하여 이 중 최소값을 계산한다
+		for (int i = 0; i < ITERATION; i += 1) {
 			int cut = getRandomCut(N, M, edges);
 			minCut = Math.min(minCut, cut);
 		}
 		return minCut;
 	}
 
-	public static int getRandomCut(int N, int M, Edge[] edges){
-		edges = randomShuffledEdges(M, edges);
+	/**
+	 * 그래프를 분할하는 임의의 우선순위에 따라 cut을 계산하는 함수
+	 *
+	 * @param N     정점의 수
+	 * @param M     간선의 수
+	 * @param edges 전체 간선의 집합
+	 * @return 그래프를 두 개의 그룹으로 분할하기 위해 제거해야 할 간선의 수
+	 */
+	public static int getRandomCut(int N, int M, Edge[] edges) {
+		// 모든 간선을 임의의 순서로 셔플링한다
+		randomShuffleEdges(M, edges);
 
+		// 간선이 없는 그래프에서 시작한다.
+		// 그룹의 수는 N이다.
 		DisjointSet disjointSet = new DisjointSet(N);
 		int components = N;
-		for(int i = 0 ; i < M; i += 1){
+
+		// 임의의 순서로 구성된 간선들에 대해 차례로 Spanning Tree를 만들어 나간다.
+		for (int i = 0; i < M; i += 1) {
 			int u = edges[i].nodeU;
 			int v = edges[i].nodeV;
 
-			if(disjointSet.find(u) != disjointSet.find(v)){
-				components -= 1;
+			if (disjointSet.find(u) != disjointSet.find(v)) {
+				// 두 정점을 이어도 Tree가 된다면 이어준다
 				disjointSet.union(u, v);
+
+				// 이 때 두 그룹은 Connected 되므로 전체 그룹의 수는 하나 준다.
+				components -= 1;
 			}
 
-			if(components == 2){
+			// 만약 전체 그래프가 두 개의 그룹만 남았다면 종료한다.
+			if (components == 2) {
 				break;
 			}
 		}
 
 		int minCut = 0;
-		for(int i = 0 ; i < M ; i += 1){
+		for (int i = 0; i < M; i += 1) {
+			// 전체 간선들에 대하여
 			int u = edges[i].nodeU;
 			int v = edges[i].nodeV;
 
-			if(disjointSet.find(u) != disjointSet.find(v)){
+			// 두 개의 서로 다른 그룹을 가로지르는 간선은
+			// 두 그룹에 대한 cut-edge이므로 카운팅한다
+			if (disjointSet.find(u) != disjointSet.find(v)) {
 				minCut += 1;
 			}
 		}
 
+		// 이 때 cut edge의 수를 반환한다
 		return minCut;
 	}
 
-	public static Edge[] randomShuffledEdges(int M, Edge[] edges){
-		List<Edge> a = Arrays.asList(edges);
-		Collections.shuffle(a);
-		return (Edge[])a.toArray();
+	/**
+	 * 모든 간선을 임의의 순서에 따라 셔플링해주는 함수
+	 *
+	 * @param M     간선의 수
+	 * @param edges 간선 정보
+	 */
+	public static void randomShuffleEdges(int M, Edge[] edges) {
+		Random random = new Random();
+		// 모든 간선에 임의의 우선순위를 부여한다.
+		for (int i = 0; i < M; i += 1) {
+			edges[i].priority = random.nextInt();
+		}
+
+		// 우선 순위에 따라서 정렬한다.
+		Arrays.sort(edges);
+
+		// 결과적으로 모든 간선이 임의의 순서로 셔플된다.
 	}
 }
 
-class Edge {
+class Edge implements Comparable<Edge> {
 	public final int nodeU;
 	public final int nodeV;
+	public int priority;
 
 	public Edge(int nodeU, int nodeV) {
 		this.nodeU = nodeU;
 		this.nodeV = nodeV;
+	}
+
+	@Override
+	public int compareTo(Edge other) {
+		return this.priority - other.priority;
 	}
 }
 
