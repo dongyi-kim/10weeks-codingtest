@@ -1,4 +1,3 @@
-package Chapter11.Problem11E;
 
 import java.util.*;
 import java.lang.*;
