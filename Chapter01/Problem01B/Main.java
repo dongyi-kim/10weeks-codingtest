@@ -16,7 +16,7 @@ public class Main {
     public static int getMax(int[] data, int n) {
         int answer = data[0];
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 1; i < n; i++) {
             if (answer < data[i]) {
                 answer = data[i];
             }
@@ -34,7 +34,6 @@ public class Main {
         }
 
         int answer = getMax(data, n);
-
         System.out.println(answer);
     }
 
