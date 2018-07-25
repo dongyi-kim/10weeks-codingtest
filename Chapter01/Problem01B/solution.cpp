@@ -10,14 +10,11 @@ using namespace std;
 * @param n
 * @return data[0] ~ data[n-1]중 최대값.
 */
-int getMax(int data[], int n)
-{
+int getMax(int data[], int n) {
 	int answer = data[0];
 
-	for (int i = 0; i < n; i++)
-	{
-		if (answer < data[i])
-		{
+	for (int i = 0; i < n; i++) {
+		if (answer < data[i]) {
 			answer = data[i];
 		}
 	}
@@ -25,15 +22,13 @@ int getMax(int data[], int n)
 	return answer;
 }
 
-int main()
-{
+int main() {
 	int n;
 	int *data;
 
 	scanf("%d", &n);
 	data = new int[n];
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		scanf("%d", &data[i]);
 	}
 
