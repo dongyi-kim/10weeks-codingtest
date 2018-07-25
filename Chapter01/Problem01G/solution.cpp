@@ -9,17 +9,13 @@ using namespace std;
 * @param school 각 사람들의 소속학교 정보 배열
 * @param n      사람들의 수
 */
-void printIndexes(string school[], int n)
-{
+void printIndexes(string school[], int n) {
 	int first = -1; //존재하지 않으면 -1
 	int last = -1;  //존재하지 않으면 -1
 
-	for (int i = 0; i < n; i++)
-	{
-		if (school[i] == "AJOU")
-		{
-			if (first == -1)
-			{
+	for (int i = 0; i < n; i++) {
+		if (school[i] == "AJOU") {
+			if (first == -1) {
 				first = i + 1;
 			}
 
@@ -30,17 +26,15 @@ void printIndexes(string school[], int n)
 	printf("%d %d\n", first, last);
 }
 
-int main()
-{
+int main() {
 	int n;
 	char buff[11];
-	string* school;
+	string *school;
 
 	scanf("%d", &n);
 	school = new string[n];
 
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		scanf("%s", buff);
 		school[i] = buff;
 	}
