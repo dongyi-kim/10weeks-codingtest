@@ -12,14 +12,11 @@ using namespace std;
 * @param end   탐색 할 가장 마지막(오른쪽) 인덱스
 * @return	   data[begin] ~ data[end] 중 가장 작은 원소의 인덱스
 */
-int getMinIndexInRange(int data[], int n, int begin, int end)
-{
+int getMinIndexInRange(int data[], int n, int begin, int end) {
 	int index = begin; //일반 data[begin]이 가장 작다고 가정
 
-	for (int i = begin; i <= end; i++)
-	{
-		if (data[index] > data[i])
-		{
+	for (int i = begin; i <= end; i++) {
+		if (data[index] > data[i]) {
 			index = i;
 		}
 	}
@@ -27,10 +24,8 @@ int getMinIndexInRange(int data[], int n, int begin, int end)
 	return index;
 }
 
-void selectionSort(int data[], int n)
-{
-	for (int i = 0; i < n; i++)
-	{
+void selectionSort(int data[], int n) {
+	for (int i = 0; i < n; i++) {
 		//주어진 범위에서 가장 작은 원소의 위치를 찾는다.
 		int minIndex = getMinIndexInRange(data, n, i, n - 1);
 
@@ -41,25 +36,21 @@ void selectionSort(int data[], int n)
 	}
 }
 
-int main()
-{
+int main() {
 	int n;
-	int* data;
+	int *data;
 
 	scanf("%d", &n);
 	data = new int[n];
 
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		scanf("%d", &data[i]);
 	}
 
 	selectionSort(data, n);
-	
-	for (int i = 0; i < n; i++)
-	{
-		if (i > 0)
-		{
+
+	for (int i = 0; i < n; i++) {
+		if (i > 0) {
 			printf(" ");
 		}
 		printf("%d", data[i]);

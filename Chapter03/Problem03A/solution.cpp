@@ -11,11 +11,11 @@ const int MAX_TABLE_LENGTH = 10000;
 * @param table  table[x] := data배열에서 x가 등장한 횟수
 */
 void fillFrequencyTable(int data[], int n, int table[]) {
-  for(int i = 0 ; i < MAX_TABLE_LENGTH; ++i){
-    table[i] = 0;
-  }
+	for (int i = 0; i < MAX_TABLE_LENGTH; ++i) {
+		table[i] = 0;
+	}
 	for (int i = 0; i < n; ++i) {
-		int number = dat[i];
+		int number = data[i];
 		table[number] += 1;
 	}
 }
@@ -47,7 +47,7 @@ int main() {
 	int n;
 
 	scanf("%d", &n);
-	int* data = new int[n];
+	int *data = new int[n];
 
 	for (int i = 0; i < n; ++i) {
 		scanf("%d", &data[i]);

@@ -9,51 +9,42 @@ using namespace std;
 * @param n
 * @return
 */
-bool isConsecutive(int data[], int n)
-{
+bool isConsecutive(int data[], int n) {
 	int maximum = data[0];
 	int minimum = data[0];
 
-	for (int i = 0; i < n; i++)
-	{
-		if (maximum < data[i])
-		{
+	for (int i = 0; i < n; i++) {
+		if (maximum < data[i]) {
 			maximum = data[i];
 		}
-		if (minimum > data[i])
-		{
+		if (minimum > data[i]) {
 			minimum = data[i];
 		}
 	}
 
-	if (maximum - minimum + 1 == n)
-	{
+	if (maximum - minimum + 1 == n) {
 		return true;
-	}
-	else{
+	} else {
 		return false;
 	}
 }
 
-int main()
-{
+int main() {
 	int n;
-	int* data;
+	int *data;
 
 	scanf("%d", &n);
 	data = new int[n];
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		scanf("%d", &data[i]);
 	}
 
 	bool result = isConsecutive(data, n);
 
 
-	if (result)
-	{
+	if (result) {
 		printf("YES");
-	}else{
+	} else {
 		printf("NO");
 	}
 

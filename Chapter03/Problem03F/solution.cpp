@@ -9,6 +9,7 @@ public:
 	int left;
 	int right;
 	long long totalPoint;
+
 	Range(int index, int left, int right) {
 		this->index = index;
 		this->left = left;
@@ -25,7 +26,7 @@ public:
 * @param ranges  각 팬이 선택한 범위의 리스트 (ranges[0] ~ ranges[m-1])
 * @return        총 점수의 합이 가장 큰 범위 객체
 */
-Range getBestRange(int n, int m, const vector<int>& cards, const vector<Range>& ranges) {
+Range getBestRange(int n, int m, const vector<int> &cards, const vector <Range> &ranges) {
 	Range answer = ranges[0];
 
 
@@ -55,7 +56,7 @@ int main() {
 	int n, m;
 	scanf("%d%d", &n, &m);
 	vector<int> cards(n + 1);
-	vector<Range> ranges;
+	vector <Range> ranges;
 
 	// 각 카드의 정보를 입력받는다.
 	for (int i = 1; i <= n; ++i) {
@@ -73,6 +74,6 @@ int main() {
 	Range answer = getBestRange(n, m, cards, ranges);
 
 	printf("%d %lld\n", answer.index, answer.totalPoint);
-  
-  return 0;
+
+	return 0;
 }

@@ -9,13 +9,10 @@ using namespace std;
 * @param n     원본 배열의 크기
 * @return  숫자의 종류의 수
 */
-int getElementTypeCount(int data[], int n)
-{
+int getElementTypeCount(int data[], int n) {
 	int countType = 0;
-	for (int i = 0; i < n; i++)
-	{
-		if (i == 0 || data[i - 1] != data[i])
-		{
+	for (int i = 0; i < n; i++) {
+		if (i == 0 || data[i - 1] != data[i]) {
 			countType += 1;
 		}
 	}
@@ -23,16 +20,14 @@ int getElementTypeCount(int data[], int n)
 	return countType;
 }
 
-int main()
-{
+int main() {
 	int n;
-	int* data;
+	int *data;
 
 	scanf("%d", &n);
 	data = new int[n];
 
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		scanf("%d", &data[i]);
 	}
 

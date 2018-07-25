@@ -12,7 +12,7 @@ const int MAX_SERIAL_NUMBER = 100000;
 * @param n
 * @param table  table[x] := data배열에서 x가 등장한 횟수
 */
-void fillFrequencyTable(const vector<int> & data, int n, vector<int> &table) {
+void fillFrequencyTable(const vector<int> &data, int n, vector<int> &table) {
 	table.clear();
 	table.resize(MAX_SERIAL_NUMBER + 1, 0);
 
@@ -30,7 +30,7 @@ void fillFrequencyTable(const vector<int> & data, int n, vector<int> &table) {
 * @param n
 * @return
 */
-vector<int> getUniqueElements(const vector<int>& data, int n) {
+vector<int> getUniqueElements(const vector<int> &data, int n) {
 
 	vector<int> ret; //유일한 원소들 배열
 
@@ -38,12 +38,10 @@ vector<int> getUniqueElements(const vector<int>& data, int n) {
 	vector<int> table;
 	fillFrequencyTable(data, n, table);
 
-	for (int number = 1; number <= MAX_SERIAL_NUMBER; number += 1)
-	{ //존재할 수 있는 모든 시리얼 넘버에 대해 차례로 조회한다.
+	for (int number = 1; number <= MAX_SERIAL_NUMBER; number += 1) { //존재할 수 있는 모든 시리얼 넘버에 대해 차례로 조회한다.
 
 		//전체 데이터에서 한 번만 등장한 number를 차례로 정답 리스트에 추가한다.
-		if (table[number] == 1)
-		{
+		if (table[number] == 1) {
 			ret.push_back(number);
 		}
 	}

@@ -12,8 +12,7 @@ using namespace std;
 int getRangeSumFromOne(int i) {
 	int sum = 0;
 
-	for (int j = 1; j <= i; j += 1)
-	{
+	for (int j = 1; j <= i; j += 1) {
 		sum += j;
 	}
 
@@ -21,11 +20,9 @@ int getRangeSumFromOne(int i) {
 }
 
 
-long long getAnswer(int N)
-{
+long long getAnswer(int N) {
 	long answer = 0;
-	for (int i = 1; i <= N; i++)
-	{
+	for (int i = 1; i <= N; i++) {
 		int rangeSum = getRangeSumFromOne(i);
 		answer += rangeSum;
 	}
@@ -33,14 +30,13 @@ long long getAnswer(int N)
 	return answer;
 }
 
-int main()
-{
+int main() {
 	int n;
 
 	scanf("%d", &n);
 
 	long long answer = getAnswer(n);
-	
+
 	printf("%lld\n", answer);
 
 	return 0;
