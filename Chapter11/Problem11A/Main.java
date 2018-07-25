@@ -76,7 +76,7 @@ class Solution{
 
 		for(int i = 0 ; i < N ; i += 1){ // 모든 열차에 대해
 			if(minimumSpeed <= S[i]){ // 이미 하한 속도를 넘겼다면 건너뛴다.
-				return false;
+				continue;
 			}
 
 			long diff = minimumSpeed - S[i]; 		// 늘려야 할 속도 량

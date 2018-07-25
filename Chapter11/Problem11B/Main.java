@@ -19,7 +19,7 @@ public class Main {
 
 		int answer = Solution.getMinimumMoveDistance(N, L, robots);
 
-		System.out.println(answer);
+		System.out.println(answer == Integer.MAX_VALUE ? -1 : answer);
 	}
 
 	public static void main(String[] args) {
@@ -92,7 +92,7 @@ class Solution {
 
 		while (lowerBound < upperBound) {
 			// 이동 거리 상한을 설정한다
-			int distanceLimit = (int) ((lowerBound + upperBound + 1) / 2);
+			int distanceLimit = (int) ((lowerBound + upperBound) / 2);
 
 			// 이후 가능 여부를 검사한다
 			boolean possible = isPossible(N, L, distanceLimit, robots);
