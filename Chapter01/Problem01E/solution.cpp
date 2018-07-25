@@ -11,40 +11,33 @@ using namespace std;
 * @param p    놀이기구 탑승 가능 체중 제한
 * @param q    놀이기구 최대 하중
 */
-void solve(int data[], int n, int p, int q)
-{
+void solve(int data[], int n, int p, int q) {
 	int c = 0; //탑승 가능한 사람의 수
 	int s = 0; //탑승 가능한 사람의 몸무게 총합
 
-	for (int i = 0; i < n; i++)
-	{   //모든 몸무게 data[i]에 대하여
+	for (int i = 0; i < n; i++) {   //모든 몸무게 data[i]에 대하여
 
-		if (data[i] <= p)
-		{  //탑승 가능한 사람의 몸무게 data[i]에 대하여
+		if (data[i] <= p) {  //탑승 가능한 사람의 몸무게 data[i]에 대하여
 			c += 1;
 			s += data[i];
 		}
 	}
 
 	printf("%d %d\n", c, s);
-	if (s <= q)
-	{
+	if (s <= q) {
 		printf("YES");
-	}
-	else{
+	} else {
 		printf("NO");
 	}
 }
 
-int main()
-{
+int main() {
 	int n, p, q;
 	int *data;
 
 	scanf("%d %d %d", &n, &p, &q);
 	data = new int[n];
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		scanf("%d", &data[i]);
 	}
 
