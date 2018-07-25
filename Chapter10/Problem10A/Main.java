@@ -16,7 +16,7 @@ public class Main {
 		LIS lis = new LIS(arr);
 		int answer = 0;
 		for (int i = 0; i < n; i += 1) {
-			answer = Math.min(answer, lis.f(i));
+			answer = Math.max(answer, lis.f(i));
 		}
 
 		System.out.println(answer);
