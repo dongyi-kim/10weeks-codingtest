@@ -10,14 +10,11 @@ using namespace std;
 * @param m    배열에서 찾고자 하는 원소
 * @return     원소가 존재한다면 인덱스를, 존재하지 않으면 -1을 반환한다.
 */
-int findIndex(int data[], int n, int m)
-{
+int findIndex(int data[], int n, int m) {
 	int index = -1;
 
-	for (int i = 0; i < n; i++)
-	{
-		if (data[i] == m)
-		{
+	for (int i = 0; i < n; i++) {
+		if (data[i] == m) {
 			index = i;
 		}
 	}
@@ -25,15 +22,13 @@ int findIndex(int data[], int n, int m)
 	return index;
 }
 
-int main()
-{
+int main() {
 	int n, m;
 	int *data;
 
 	scanf("%d %d", &n, &m);
 	data = new int[n];
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		scanf("%d", &data[i]);
 	}
 
