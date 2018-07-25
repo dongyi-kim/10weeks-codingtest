@@ -11,28 +11,23 @@ using namespace std;
 * @param s     지수의 키
 * @return      미주 혹은 지수와  키가 일치하는 사람의 수
 */
-int getCount(int data[], int n, int m, int s)
-{
+int getCount(int data[], int n, int m, int s) {
 	int count = 0; //확인해보아야 할 후보의 수
-	for (int i = 0; i < n; i++)
-	{
-		if (data[i] == m || data[i] == s)
-		{
+	for (int i = 0; i < n; i++) {
+		if (data[i] == m || data[i] == s) {
 			count += 1;
 		}
 	}
 	return count;
 }
 
-int main()
-{
+int main() {
 	int n, m, s;
 	int *data;
 
 	scanf("%d %d %d", &n, &m, &s);
 	data = new int[n];
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		scanf("%d", &data[i]);
 	}
 
