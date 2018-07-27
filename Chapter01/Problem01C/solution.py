@@ -9,8 +9,8 @@ def get_count(data, n, m, s):
 	"""
 	count = 0
 
-	for i in range(n):
-		if data[i] == m or data[i] == s:
+	for value in data:
+		if value == m or value == s:
 			count += 1
 
 	return count
