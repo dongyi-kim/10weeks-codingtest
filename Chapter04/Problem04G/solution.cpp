@@ -3,10 +3,10 @@
 
 using namespace std;
 
-template <typename T>
+template<typename T>
 class ShiftingArray {
 public:
-	vector<T> array; // 내부에 데이터를 저장할 배열
+	vector <T> array; // 내부에 데이터를 저장할 배열
 	int length;       // 배열의 길이
 	int leftIndex;
 
@@ -91,31 +91,31 @@ int main() {
 	}
 
 	// 각 명령어를 처리한다
-	for (int i = 0 ; i < nCommands; ++i) {
+	for (int i = 0; i < nCommands; ++i) {
 		// 명령어 정보를 입력받는다
 		int cmd;
 		scanf("%d", &cmd);
 
-		if( cmd == 0 ) {   
+		if (cmd == 0) {
 			// 현재 배열에 p번 인덱스에 있는 원소를 출력하는 명령
 			int p;
 			scanf("%d", &p);
 
 			int value = array.get(p);
 			printf("%d\n", value);
-		} else if(cmd == 1) {   
+		} else if (cmd == 1) {
 			// 현재 배열을 왼쪽으로 k번 shift하는 명령
 			int k;
 			scanf("%d", &k);
 
 			array.shiftLeft(k);
-		} else if(cmd == 2) {   
+		} else if (cmd == 2) {
 			// 현재 배열을 오른쪽으로 k번 shift하는 명령
 			int k;
 			scanf("%d", &k);
 
 			array.shiftRight(k);
-		} else if(cmd == 3) {   
+		} else if (cmd == 3) {
 			// 현재 배열을 최초의 위치로 복원하는 명령
 			array.initializePosition();
 		}

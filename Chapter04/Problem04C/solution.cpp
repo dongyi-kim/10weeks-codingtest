@@ -11,7 +11,7 @@ using namespace std;
  * @return
  */
 long long getGCD(long long a, long long b) {
-	while (a % b != 0)  {   // b가 a의 약수가 아니라면 반복한다
+	while (a % b != 0) {   // b가 a의 약수가 아니라면 반복한다
 		long long c = a % b; // 나머지를 계산한다
 		a = b;          // 이후 b와 c에 대해 이 과정을 반복한다
 		b = c;          // a <= b, b <= c
@@ -36,8 +36,8 @@ void process(int caseIndex) {
 	int num1, num2;
 	scanf("%d%d", &num1, &num2);
 
-	long long gcd =  getGCD(num1, num2);
-	long long lcm =  getLCM(num1, num2);
+	long long gcd = getGCD(num1, num2);
+	long long lcm = getLCM(num1, num2);
 
 	printf("Case #%d:\n", caseIndex);
 	printf("%lld %lld\n", gcd, lcm);

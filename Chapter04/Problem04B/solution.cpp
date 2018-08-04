@@ -39,11 +39,11 @@ public:
 	}
 };
 
-vector<int> getTicketNumbers(int n, int m, const vector<int>& ids) {
+vector<int> getTicketNumbers(int n, int m, const vector<int> &ids) {
 	vector<int> tickets;
 	TicketTable table = TicketTable(n);
 
-	for(int i = 0; i < m; i ++) {
+	for (int i = 0; i < m; i++) {
 		int userId = ids[i];
 		int ticketIndex = table.findEmptyIndexByUserId(userId);
 		tickets.push_back(ticketIndex);

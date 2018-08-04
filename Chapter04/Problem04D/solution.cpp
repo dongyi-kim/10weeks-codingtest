@@ -20,14 +20,14 @@ long long getLCM(long a, long b) {
  * @param numbers
  * @return
  */
-long long getLCM(vector<long long>& numbers) {
+long long getLCM(vector<long long> &numbers) {
 	if (numbers.size() == 0) {
 		return 0;
 	}
 
 	long long lcm = numbers[0];
 
-	for (int i = 1; i < numbers.size(); i += 1)  {   
+	for (int i = 1; i < numbers.size(); i += 1) {
 		// 모든 숫자 numbers[i]에 대하여 차례로
 		// lcm := numbers[0] ~ numbers[i-1]에 대한 최대 공약수
 		lcm = getLCM(lcm, numbers[i]);
@@ -44,7 +44,7 @@ long long getLCM(vector<long long>& numbers) {
  * @param sizes 각 순환 수열의 길이(주기)
  * @return
  */
-long long getGlobalPeriod(vector<long long>& sizes) {
+long long getGlobalPeriod(vector<long long> &sizes) {
 	long globalPeriod = getLCM(sizes);
 	return globalPeriod;
 }
@@ -55,7 +55,7 @@ int main() {
 
 	vector<long long> sizes(n);
 
-	for (int i = 0; i < n ; i += 1) {
+	for (int i = 0; i < n; i += 1) {
 		scanf("%lld", &sizes[i]);
 	}
 

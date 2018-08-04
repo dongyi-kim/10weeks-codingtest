@@ -6,7 +6,7 @@ const int MAX_ROW = 9;
 const int MAX_COL = 9;
 
 
-class SudokuBoard{
+class SudokuBoard {
 public:
 	// 칸의 번호로 행의 번호를 계산하는 메소드
 	int getRowByIndex(int index) {

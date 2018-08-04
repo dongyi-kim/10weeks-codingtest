@@ -43,7 +43,7 @@ public:
 	int getIndex(int x, int y) {
 		// x번째 날짜는 항상 왼쪽 번호가 x다.
 		// 그리고 왼쪽 날짜는 M 주기로 항상 x가 등장한다 
-		for (int index = x; index <= M * N; index += M){
+		for (int index = x; index <= M * N; index += M) {
 			// 왼쪽이 x인 모든 날짜에 대해 
 			if (getYByIndex(index) == y) {
 				// 오른쪽이 y인 날짜가 존재한다면 반환한다
