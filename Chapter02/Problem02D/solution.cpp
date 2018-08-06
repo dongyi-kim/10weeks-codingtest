@@ -24,6 +24,7 @@ public:
 
 	MyString(const string &original) {
 		this->length = original.length();
+		this->characters = new char[this->length];
 		for (int i = 0; i < this->length; i += 1) {
 			this->characters[i] = original[i];
 		}
@@ -34,7 +35,7 @@ public:
 	}
 
 	/**
-	 * @param o      비교 할 문자열 (오른쪽 항) 
+	 * @param o      비교 할 문자열 (오른쪽 항)
 	 * @return true  this가 o보다 사전순으로 앞선다면 true
 	 * @return false else
 	 */
@@ -55,7 +56,7 @@ public:
 	}
 
 	/**
-	 * @param o      비교 할 문자열 (오른쪽 항 ) 
+	 * @param o      비교 할 문자열 (오른쪽 항 )
 	 * @return true  o가 this보다 사전순으로 앞선다면 true
 	 * @return false else
 	 */
@@ -76,8 +77,8 @@ public:
 	}
 
 	/**
-	 * @param o      비교 할 문자열 (오른쪽 항 ) 
-	 * @return true  두 문자열이 같다면 
+	 * @param o      비교 할 문자열 (오른쪽 항 )
+	 * @return true  두 문자열이 같다면
 	 * @return false 두 문자열이 다르다면
 	 */
 	bool operator==(const MyString &o) const {
