@@ -40,21 +40,6 @@ public class Main {
 			}
 		}
 	}
-
-	/**
-	 * 정수 a의 나머지 m에 대한 곱셈의 역원을 반환하는 함수
-	 * gcd(a, m) == 1 인 경우에만 사용해야 한다.
-	 *
-	 * @param a
-	 * @param m
-	 * @return
-	 */
-	public static long getInverse(long a, long m) {
-		BigInteger bigA = new BigInteger(String.valueOf(a));    // 정수 a에 대한 BigInteger
-		BigInteger bigM = new BigInteger(String.valueOf(m));    // 나머지 m에 대한 BigInteger
-		BigInteger bigInv = bigA.modInverse(bigM);              // 곱셈의 역원 BigInteger
-		return Long.parseLong(bigInv.toString());             // 다시 long 타입으로 변환 후 반환
-	}
 }
 
 
