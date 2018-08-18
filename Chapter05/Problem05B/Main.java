@@ -32,11 +32,16 @@ public class Main {
 					if(wastes[i][maxCol] >= 1){
 						sumOfWastes += 1;
 					}
-					if(wastes[i][minCol] >= 1){
-						sumOfWastes -= 1;
+					if(minCol >= 1){
+						if(wastes[i][minCol-1] >= 1){
+							sumOfWastes -= 1;
+						}
 					}
 				}
 
+				if(minCol >= 0){
+					answer = Math.min(sumOfWastes, answer);
+				}
 			}
 		}
 
