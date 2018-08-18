@@ -35,7 +35,7 @@ public class Main {
 				for(int length = 1; length <= N; length += 1){
 					int newR = r + deltaR[di] * length;
 					int newC = c + deltaC[di] * length;
-					if(gameMap.isInside(newR, newC)){
+					if(gameMap.isInside(newR, newC) == false){
 						break;
 					}
 
