@@ -8,7 +8,6 @@ public class Main {
 	public static final int[] deltaR = {-1, -1, -1, 0, 0, 1, 1, 1};
 	public static final int[] deltaC = {-1, 0, 1, -1, 1, -1, 0, 1};
 	
-	
 	public static void testCase(int caseIndex) {
 		int N = scanner.nextInt();
 		
