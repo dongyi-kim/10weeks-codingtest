@@ -35,8 +35,12 @@ public class Main {
 			}
 
 			while(rangeMinimum.isEmpty() == false
-					&&  rangeMinimum.peek().income < leftEnd){
+					&&  rangeMinimum.peek().index < leftEnd){
 				rangeMinimum.poll();
+			}
+
+			if(leftEnd < 0){
+				continue;
 			}
 
 			// 검사 범위 내에 존재하는 최대/최소 소득간의 차이를 계산한다
