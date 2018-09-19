@@ -7,6 +7,8 @@
 *.input
 *.output
 
+#data folders
+*/data/
 gen.py
 
 .vscode
