@@ -68,7 +68,7 @@ vector<Bomb*> isAllRemoveable(int n, vector<Bomb*> &bombs) {
 	return removedList;
 }
 
-void testCase() {
+void testCase(int caseIdx) {
 	int n, m;
 	scanf("%d %d", &n, &m);
 
@@ -105,9 +105,10 @@ void testCase() {
 }
 
 int main() {
-	int t; scanf("%d", &t);
-	while (t--) {
-		testCase();
+	int caseSize;
+	scanf("%d", &caseSize);
+	for (int caseIdx = 1; caseIdx <= caseSize; caseIdx++) {
+		testCase(caseIdx);
 	}
 	return 0;
 }
