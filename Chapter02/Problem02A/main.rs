@@ -17,34 +17,31 @@ fn stdinln_vec_i32() -> Vec<i32> {
 	ret
 }
 
-fn sum_vec_i32_customized(source: Vec<i32>, nr_items: usize, max_each: i32, max_total: i32) {
-	// 문제에 맞게 함수를 완성해주세요.
-	let mut total = 0;
-	let mut nr_match = 0;
-	// for person in target.iter_to() <<- 를 써도 좋다.
-	for i in 0..nr_items {
-		if(source[i] <= max_each){
-			total += source[i];
-			nr_match += 1;
+fn solve(nr_case: usize, heights: &Vec<i32>, births: &Vec<i32>, match_birth: i32) -> Option<i32> {
+	let mut tallest :i32 = -1;
+	for i in 0..nr_case{
+		if births[i] == match_birth {
+			if heights[i] > tallest {
+				tallest = heights[i];
+			}
 		}
 	}
 	
-	println!("{} {}", nr_match, total);
-	
-	let result: bool = total<=max_total;
-	
-	match result {
-		true => println!("YES"),
-		false => println!("NO"),
+	if tallest >= 0 {
+		Some(tallest)
+	}else {
+		None
 	}
 }
 
 fn main(){
-	let case_spec = stdinln_vec_i32();
-	let nr_person = case_spec[0] as usize;
-	let max_each = case_spec[1];
-	let max_total = case_spec[2];
-	let case_data = stdinln_vec_i32();
-	// sum_vec_i32_customized 를 완성해주세요!
-	sum_vec_i32_customized(case_data, nr_person, max_each, max_total);
+	let nr_case = stdinln_i32() as usize;
+	let heights = stdinln_vec_i32();
+	let births = stdinln_vec_i32();
+	let match_birth = stdinln_i32();
+	let result = solve(nr_case, &heights, &births, match_birth);
+	match result {
+		Some(x)	=> println!("{}", x),
+		None		=> println!("{}", -1),
+	}
 }
