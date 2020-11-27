@@ -21,20 +21,19 @@ fn i32_from_vec_u8(vector :&Vec<u8>) -> i32{
 	ret
 }
 
+// N개의 Space로 구분된 i32를 Vec<i32>로 반환합니다. Ex)"1 2 3 4\n"
 fn heavy_stdinln_vec_i32(len: usize) -> Vec<i32> {
 	// 이 함수는 하나의 줄을 stdin으로 받아 여러개의 integer 을 vector로 리턴합니다.
 	// 일부 코딩테스트 케이스입력에서 너무 긴 테스트케이스를 입력받기위해 사용.
-	let mut ret: Vec<i32> = Vec::new();
-	for _i in 0..len-1 {
-		let mut __stdin = io::stdin();
-		let mut __stdinlck = __stdin.lock();
-		let mut slice: Vec<u8> = Vec::new();
-		__stdinlck.read_until(b' ', &mut slice).expect("Error");
-		ret.push(i32_from_vec_u8(&slice));
-	}
 	let mut __stdin = io::stdin();
 	let mut __stdinlck = __stdin.lock();
+	let mut ret: Vec<i32> = Vec::new();
 	let mut slice: Vec<u8> = Vec::new();
+	for _i in 0..len-1 {
+		__stdinlck.read_until(b' ', &mut slice).expect("Error");
+		ret.push(i32_from_vec_u8(&slice));
+		slice.clear();
+	}
 	__stdinlck.read_until(b'\n', &mut slice).expect("Error");
 	ret.push(i32_from_vec_u8(&slice));
 	ret
