@@ -8,7 +8,7 @@ fn stdinln_i32() -> i32 {
 	buffer.trim().parse::<i32>().unwrap()
 }
 
-// (len: usize) 몇개가 들어올지는 확실히 정해져있습니다.
+// Vec<u8> -> i32
 fn i32_from_vec_u8(vector :&Vec<u8>) -> i32{
 	let mut ret: i32 = 0;
 	for i in 0..vector.len() {
@@ -23,6 +23,7 @@ fn i32_from_vec_u8(vector :&Vec<u8>) -> i32{
 
 fn heavy_stdinln_vec_i32(len: usize) -> Vec<i32> {
 	// 이 함수는 하나의 줄을 stdin으로 받아 여러개의 integer 을 vector로 리턴합니다.
+	// 일부 코딩테스트 케이스입력에서 너무 긴 테스트케이스를 입력받기위해 사용.
 	let mut ret: Vec<i32> = Vec::new();
 	for _i in 0..len-1 {
 		let mut __stdin = io::stdin();
@@ -98,6 +99,9 @@ impl IAmRoot {
 
 fn main() {
 	let nr_fan = stdinln_i32() as usize;
+	// 기존의 stdin으로는 rust의 기본 buffer크기때문에 한줄에
+	// 8Kbyte이상오는 testcase를 읽을 수 없습니다.
+	// 따라서 이번 문제는 새로 커스텀한 heavy_stdinln_vec_i32 을 사용합니다.
 	let mut kernel_study = IAmRoot::new_from_vec(heavy_stdinln_vec_i32(nr_fan), nr_fan);
 	kernel_study.solve();
 }
