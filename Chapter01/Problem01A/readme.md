@@ -1,9 +1,11 @@
 # 힌트
 
 <details>
-<summary>보기</summary>
-a와 b의 대소관계에 따라서 케이스를 나누어 볼 수 있다
-</details>
+<summary>보기</summary><p>
+  
+> a와 b의 대소관계에 따라서 케이스를 나누어 볼 수 있다
+
+</p></details>
 
 # 해설 
 
