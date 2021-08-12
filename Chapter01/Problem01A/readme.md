@@ -24,3 +24,4 @@ a와 b의 대소관계에 따라서 케이스를 나누어 볼 수 있다
 - Java - `Math.max(a,b)`
 - C++ - `std::max(a, b)`
 - python - `max(a,b)`
+- javascript - `Math.max(a,b)`
