@@ -17,23 +17,14 @@ fn stdinln_vec_i32() -> Vec<i32> {
 	ret
 }
 
+fn max_vec_i32(source: Vec<i32>) -> i32 {
+	// Vec<i32>에서 Maximum을 구하는 함수 예시.
+	let max = source.iter().max().unwrap();
+	*(max)
+}
+
 fn main(){
-	// 이 문제는 match 로 풀수 있을거라고 생각 할 수 있다.
-	// 하지만 rust에서는 state safe를 위해서
-	// match에서 변수를 match케이스로 사용할 수 없다!
-	// 주의하자!
-	let case_flag = stdinln_vec_i32();
-	let person_data = stdinln_vec_i32();
-	// let N = case_flag[0];
-	let miju = case_flag[1];
-	let suji = case_flag[2];
-	let mut answer = 0;
-	for person in person_data.into_iter() {
-		if(person == miju){
-			answer += 1;
-		}else if(person == suji){
-			answer += 1;
-		}
-	}
-	println!("{}", answer);
+	let nr_case = stdinln_i32();
+	let biggest = max_vec_i32(stdinln_vec_i32());
+	println!("{}", biggest);
 }

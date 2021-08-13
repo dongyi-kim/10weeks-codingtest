@@ -1,10 +1,12 @@
-function getMax(array, length) {
-  var max = 0;
-  for (var i=0; i<length; i++) {
-    if (array[i] >= max)
-      max = array[i];
+function get_sum(data, length)
+{
+  var sum = 0;
+
+  for (var i=0; i<length; i++)
+  {
+    sum += data[i];
   }
-	return max;
+  return sum;
 }
 
 const input = [];
@@ -14,7 +16,8 @@ require('readline')
     input.push(line.trim());
   })
   .on('close', function() {
-		const length = parseInt(input[0]);
-		const values = input[1].split(" ").map(Number);
-		console.log(getMax(values, length));
+    const length = parseInt(input[0]);
+    const data = input[1].split(" ").map(Number);
+    const answer = get_sum(data, length);
+		console.log(answer);
 	});

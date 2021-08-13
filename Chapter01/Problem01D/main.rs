@@ -17,20 +17,23 @@ fn stdinln_vec_i32() -> Vec<i32> {
 	ret
 }
 
-fn sum_vec_i32(source: Vec<i32>, nr_items: usize) -> i32 {
-	let mut ret: i32 = 0;
-	// Vec<i32>에서 sum을 구하는 함수를 만들어주십시오.
-	for i in 0..nr_items {
-		ret += source[i];
-	}
-	// ret에 저장한 합계를 return합니다.
-	ret
-}
-
 fn main(){
-	let nr_cases = stdinln_i32() as usize;
-	let inputs = stdinln_vec_i32();
-	// sum_vec_i32 를 완성해주세요!
-	let result = sum_vec_i32(inputs, nr_cases);
-	println!("{}", result);
+	// 이 문제는 match 로 풀수 있을거라고 생각 할 수 있다.
+	// 하지만 rust에서는 state safe를 위해서
+	// match에서 변수를 match케이스로 사용할 수 없다!
+	// 주의하자!
+	let case_flag = stdinln_vec_i32();
+	let person_data = stdinln_vec_i32();
+	// let N = case_flag[0];
+	let miju = case_flag[1];
+	let suji = case_flag[2];
+	let mut answer = 0;
+	for person in person_data.into_iter() {
+		if(person == miju){
+			answer += 1;
+		}else if(person == suji){
+			answer += 1;
+		}
+	}
+	println!("{}", answer);
 }

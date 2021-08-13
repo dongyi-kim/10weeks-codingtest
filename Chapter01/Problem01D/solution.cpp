@@ -4,33 +4,34 @@
 using namespace std;
 
 /**
-* 정수 배열의 모든 원소의 합을 계산하는 함수
 *
-* @param data
-* @param n
-* @return data[0] ~ data[n-1]의 합
+* @param data 각 사람들의 키를 저장한 배열
+* @param n     사람들의 수
+* @param m     미주의 키
+* @param s     지수의 키
+* @return      미주 혹은 지수와  키가 일치하는 사람의 수
 */
-int getSum(int data[], int n) {
-	int answer = 0;
-
+int getCount(int data[], int n, int m, int s) {
+	int count = 0; //확인해보아야 할 후보의 수
 	for (int i = 0; i < n; i++) {
-		answer += data[i];
+		if (data[i] == m || data[i] == s) {
+			count += 1;
+		}
 	}
-
-	return answer;
+	return count;
 }
 
 int main() {
-	int n;
+	int n, m, s;
 	int *data;
 
-	scanf("%d", &n);
+	scanf("%d %d %d", &n, &m, &s);
 	data = new int[n];
 	for (int i = 0; i < n; i++) {
 		scanf("%d", &data[i]);
 	}
 
-	int answer = getSum(data, n);
+	int answer = getCount(data, n, m, s);
 
 	printf("%d\n", answer);
 	delete[] data;

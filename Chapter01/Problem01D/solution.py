@@ -1,24 +1,26 @@
-def get_sum(data, n):
+def get_count(data, n, m, s):
 	"""
-	n개의 정수 data 배열에서 모든 정수의 합을 반환하는 함수
 
-	:param data:
-	:param n:
-	:return:
+	:param data:	각 사람들의 키를 저장한 배열
+	:param n:		사람들의 수
+	:param m:	미주의 키
+	:param s:	지수의 키
+	:return:	미주 혹은 지수와  키가 일치하는 사람의 수
 	"""
-	answer = 0
+	count = 0
 
 	for value in data:
-		answer += value
+		if value == m or value == s:
+			count += 1
 
-	return answer
+	return count
 
 
 if __name__ == "__main__":
-	n = int(input())
+	n, m, s = [int(word) for word in input().split()]
 
-	data = [int(word) for word in input().split()]
+	heights = [int(word) for word in input().split()]
 
-	answer = get_sum(data, n)
+	answer = get_count(heights, n, m, s)
 
 	print(answer)

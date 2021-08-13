@@ -17,14 +17,20 @@ fn stdinln_vec_i32() -> Vec<i32> {
 	ret
 }
 
-fn max_vec_i32(source: Vec<i32>) -> i32 {
-	// Vec<i32>에서 Maximum을 구하는 함수 예시.
-	let max = source.iter().max().unwrap();
-	*(max)
+fn sum_vec_i32(source: Vec<i32>, nr_items: usize) -> i32 {
+	let mut ret: i32 = 0;
+	// Vec<i32>에서 sum을 구하는 함수를 만들어주십시오.
+	for i in 0..nr_items {
+		ret += source[i];
+	}
+	// ret에 저장한 합계를 return합니다.
+	ret
 }
 
 fn main(){
-	let nr_case = stdinln_i32();
-	let biggest = max_vec_i32(stdinln_vec_i32());
-	println!("{}", biggest);
+	let nr_cases = stdinln_i32() as usize;
+	let inputs = stdinln_vec_i32();
+	// sum_vec_i32 를 완성해주세요!
+	let result = sum_vec_i32(inputs, nr_cases);
+	println!("{}", result);
 }
