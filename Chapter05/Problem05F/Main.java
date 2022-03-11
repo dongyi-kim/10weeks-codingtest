@@ -7,49 +7,78 @@ public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
 
-	public static void testCase(int caseIndex) throws Exception {
-		int N = scanner.nextInt();
+	public static ArrayList<Bomb> getRemovableOrders(int n, Bomb[] bombs) {
+		ArrayList<Bomb> removedList = new ArrayList<>();
 
-		int[][] map = new int[N][N];
+		// poll시에 제거 가능한 폭탄들 중 가장 인덱스가 작은 번호가 반환될 수 있도록
+		// PriorityQueue를 사용한다. 폭탄들의 우선순의는 compareTo 메소드로 정의했다.
+		PriorityQueue<Bomb> removableBombs = new PriorityQueue<>();
 
-		Robot robot = new Robot();
-
-		int index = 0;
-		int lastIndex = N * N;
-		for (int level = 1; index < lastIndex; level += 1) {
-			for (int phase = 0; phase < 3; phase += 1) {
-				int steps = level;
-				if (phase == 0) {
-					steps = 1;
-				}
-
-				for (int s = 0; s < steps && index < lastIndex; s += 1) {
-					index += 1;
-					Position2D curPos = robot.getPosition();
-					map[curPos.r][curPos.c] = index;
-					robot.goStraight();
-				}
-
-
-				robot.turnNext();
+		for (int i = 0; i < n; i += 1) {
+			if (bombs[i].getChildCount() == 0) {
+				removableBombs.add(bombs[i]);
 			}
 		}
 
+		while (removableBombs.isEmpty() == false) {
+			Bomb b = removableBombs.poll();
+			b.remove();
 
-		printMap(map, N);
+			removedList.add(b);
+
+			ArrayList<Bomb> parents = b.getParentBombs();
+			for (int i = 0; i < parents.size(); i += 1) {
+				Bomb p = parents.get(i);
+				if (p.getChildCount() == 0) {
+					removableBombs.add(p);
+				}
+			}
+		}
+
+		// 모든 폭탄이 제거되지 않았다면 null을 반환한다.
+		if (removedList.size() != n) {
+			return null;
+		}
+		return removedList;
 	}
 
-	public static void printMap(int[][] map, int N) throws Exception{
-		for (int r = 0; r < N; r += 1) {
-			for (int c = 0; c < N; c += 1) {
-				if (c > 0) {
-					writer.write(" ");
-				}
-				writer.write(String.valueOf(map[r][c]));
-			}
-			writer.write("\n");
+	public static void testCase(int caseIndex) throws Exception {
+		int n = scanner.nextInt();
+		int m = scanner.nextInt();
+
+		Bomb[] bombs = new Bomb[n];
+		for (int i = 0; i < n; i += 1) {
+			bombs[i] = new Bomb(i);
 		}
-		writer.flush();
+
+		for (int i = 0; i < m; i++) {
+			int u = scanner.nextInt() - 1;
+			int v = scanner.nextInt() - 1;
+			Bomb parent = bombs[u];
+			Bomb child = bombs[v];
+
+			child.addParentBombs(parent);
+		}
+
+		ArrayList<Bomb> orders = getRemovableOrders(n, bombs);
+
+		if (orders == null) {
+			writer.write("NO\n");
+		} else {
+			// 출력이 길 수 있으므로 StringBuilder를 사용해 한 줄의 출력 결과를 완성한다
+			StringBuilder outputBuilder = new StringBuilder();
+			for (int i = 0; i < n; i++) {
+				Bomb b = orders.get(i);
+
+				if (i > 0) {
+					outputBuilder.append(" ");
+				}
+				outputBuilder.append(b.index + 1);
+			}
+			outputBuilder.append("\n");
+			// 정답을 출력한다
+			writer.write(outputBuilder.toString());
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -65,45 +94,42 @@ public class Main {
 
 }
 
-class Robot {
-	public static final int[] deltaR = new int[]{0, 1, 0, 1, 0, -1};
-	public static final int[] deltaC = new int[]{1, 0, -1, 0, 1, 0};
+class Bomb implements Comparable<Bomb> {
+	public final int index;
 
-	private int direction;
-	private Position2D position;
+	private int childCount;
+	private ArrayList<Bomb> parentBombs;
 
-	public Robot() {
-		this.position = new Position2D(0, 0);
-		this.direction = 0;
+	Bomb(int index) {
+		this.index = index;
+		this.parentBombs = new ArrayList<>();
+		this.childCount = 0;
 	}
 
-	public void goStraight() {
-		this.position = getNextPosition();
+	public void addParentBombs(Bomb parentBomb) {
+		this.parentBombs.add(parentBomb);
+		parentBomb.childCount += 1;
 	}
 
-	public Position2D getNextPosition() {
-		int newR = position.r + deltaR[direction];
-		int newC = position.c + deltaC[direction];
-
-		Position2D newPosition = new Position2D(newR, newC);
-		return newPosition;
+	public ArrayList<Bomb> getParentBombs() {
+		return this.parentBombs;
 	}
 
-	public Position2D getPosition() {
-		return this.position;
+	public int getChildCount() {
+		return childCount;
 	}
 
-	public void turnNext(){
-		this.direction = (this.direction + 1) % deltaC.length;
+	public void remove() {
+		for (int i = 0; i < parentBombs.size(); i += 1) {
+			Bomb p = parentBombs.get(i);
+			p.childCount -= 1;
+		}
 	}
-}
 
-class Position2D {
-	public final int r;
-	public final int c;
-
-	public Position2D(int r, int c) {
-		this.r = r;
-		this.c = c;
+	@Override
+	public int compareTo(Bomb o) {
+		// 인덱스가 작을수록 priorityQueue에서 먼저 poll 되도록
+		// 우선순위를 정의한다.
+		return this.index - o.index;
 	}
 }

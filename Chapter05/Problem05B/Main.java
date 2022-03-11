@@ -1,3 +1,8 @@
+package Chapter06.Problem06B;
+/**
+ * 코드를 제출하기 전에 꼭!!! 위의 패키지 임포트 명령어를 제거해주세요!
+ **/
+
 import java.io.*;
 import java.lang.*;
 import java.util.*;
@@ -5,75 +10,91 @@ import java.util.*;
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
-	
-	public static final int EMPTY = 0;  // 폐기물이 존재하지 않는 칸
-	public static final int EXISTS = 1; // 폐기물이 존재하는 칸
-	
-	public static void testCase(int caseIndex) {
-		int N = scanner.nextInt();
-		int K = scanner.nextInt();
-		
-		// 각 칸의 정보를 입력받는다.
-		int[][] wastes = new int[N][N];
-		for (int r = 0; r < N; r += 1) {
-			for (int c = 0; c < N; c += 1) {
-				// wastes[r][c] := (r행 c열)칸의 폐기물 존재 여부
-				wastes[r][c] = scanner.nextInt();
+	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+
+
+	/**
+	 * 파라미터로 주어지는 각 타워들에 대해 타겟 타워를 계산하는 함수
+	 *
+	 * @param n         타워의 수
+	 * @param towers    왼쪽~오른쪽 순서로 저장된 타워 배열
+	 */
+	public static void findTargetTowers(int n, Tower[] towers){
+		// 현재 다른 타워의 신호를 수신할 가능성이 있는 타워들
+		Stack<Tower> touchableTowers = new Stack<>();
+
+		for(int i = 0 ; i < n ; i ++) {
+			Tower t = towers[i];    // 각 타워 t에 대해 차례로 고려
+			Tower target = null;    // 타워 t의 신호를 수신할 후보 ( 초기값 null )
+
+			while(touchableTowers.isEmpty() == false
+					&& touchableTowers.peek().height < t.height){
+				// t보다 높이가 낮은 타워들은 이후에도 수신 가능성이 없으므로 제거
+				touchableTowers.pop();
 			}
+
+			// t 이상의 높이를 가진 타워가 남아있다면?
+			if(touchableTowers.size() > 0){
+				// t는 해당 타워를 타겟으로 정하게 된다.
+				target = touchableTowers.peek();
+			}
+
+			// 계산한 타겟 정보를 저장한다.
+			t.setTargetTower(target);
+
+			// t는 마지막에 등장했으므로 다른 타워의 신호를 수신할 수 있다. 등록.
+			touchableTowers.push(t);
 		}
-		
-		int answer = Integer.MAX_VALUE;
-		
-		// K*K 크기의 영역이 존재할 수 있는 모든 지점을 탐색한다.
-		// 가장 위의 칸이 (firstRow)행에 존재하는 영역들을 조사한다.
-		for (int firstRow = 0; firstRow + K - 1 < N; firstRow += 1) {
-			int lastRow = firstRow + K - 1;
-			
-			// 가장 왼쪽 K열로 구성된 영역에 대한 폐기물 수를 계산하고 갱신한다.
-			int numberOfWastes = 0;
-			for (int r = firstRow; r <= lastRow; r += 1) {
-				for (int c = 0; c <= K - 1; c += 1) {
-					if (wastes[r][c] == EXISTS) {
-						numberOfWastes += 1;
-					}
-				}
-			}
-			answer = Math.min(answer, numberOfWastes);
-			
-			// 이후 열 방향으로 Sliding Window 기법으로 이동하며 영역의 정보를 갱신한다.
-			for (int c = K; c < N; c += 1) 
-			{   // 기존 영역을 열방향으로 오른쪽으로 이동한 경우 
-				
-				int newColumn = c; // 새롭게 추가되는 열의 번호 
-				int oldColumn = c - K;  // 새롭게 제거되는 열의 번호 
-				
-				for (int r = firstRow; r <= lastRow; r += 1) {
-					// 해당 열에서 추가되는 폐기물의 수를 반영한다 
-					if (wastes[r][newColumn] == EXISTS) {
-						numberOfWastes += 1;
-					}
-					
-					// 해당 열에서 삭제되는 폐기물의 수를 반영한다 
-					if (wastes[r][oldColumn] == EXISTS) {
-						numberOfWastes -= 1;
-					}
-				}
-				
-				// 계산된 해당 영역의 폐기물 수를 갱신한다
-				answer = Math.min(answer, numberOfWastes);
-			}
-		}
-		
-		System.out.println(answer);
 	}
-	
+
 	public static void main(String[] args) throws Exception {
-		int caseSize = scanner.nextInt();
-		
-		for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1) {
-			testCase(caseIndex);
+		int n = scanner.nextInt();
+
+		Tower[] towers = new Tower[n];
+		for(int i = 0 ; i < n ; i++) {
+			int hi = scanner.nextInt();
+			towers[i] = new Tower(i + 1, hi );  // 인덱스 1부터 저장
 		}
-		
+
+		// 각 타워가 송신하는 레이저에 대해 타겟을 모두 계산한다
+		findTargetTowers(n, towers);
+
+		for(int i = 0 ; i < n; i ++) {
+			if(i > 0 ){
+				writer.write(" ");
+			}
+
+			Tower t = towers[i];
+			if(t.getTargetTower() == null){
+				writer.write("0");
+			}else{
+				int targetIndex = t.getTargetTower().index;
+				writer.write(String.valueOf(targetIndex));
+			}
+		}
+		writer.flush();
+		writer.close();
 	}
-	
+
+}
+
+class Tower{
+	public final int index;     // 타워의 인덱스
+	public final int height;    // 타워의 높이
+
+	private Tower targetTower;  // 이 타워의 레이저를 수신하는 대상 타워
+
+	public Tower(int index, int height){
+		this.index = index;
+		this.height = height;
+		this.targetTower = null;
+	}
+
+	public void setTargetTower(Tower targetTower) {
+		this.targetTower = targetTower;
+	}
+
+	public Tower getTargetTower() {
+		return targetTower;
+	}
 }

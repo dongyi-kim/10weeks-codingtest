@@ -5,59 +5,93 @@ import java.util.*;
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
-	
-	public static final int EMPTY = 0;  // 폐기물이 존재하지 않는 칸 
-	public static final int EXISTS = 1; // 폐기물이 존재하는 칸 
-	
-	public static void testCase(int caseIndex) {
-		int N = scanner.nextInt();
-		int K = scanner.nextInt();
-		
-		// 각 칸의 정보를 입력받는다.
-		int[][] wastes = new int[N][N];
-		for (int r = 0; r < N; r += 1) {
-			for (int c = 0; c < N; c += 1) {
-				// wastes[r][c] := (r행 c열)칸의 폐기물 존재 여부 
-				wastes[r][c] = scanner.nextInt();
-			}
-		}
-		
-		int answer = Integer.MAX_VALUE;
-		
-		// K*K 크기의 영역이 존재할 수 있는 모든 지점을 탐색한다.
-		// 왼쪽 위 모서리 칸을 (firstRow, firstCol)로 기준을 두고 탐색한다.
-		for (int firstRow = 0; firstRow + K - 1 < N; firstRow += 1) {
-			for (int firstCol = 0; firstCol + K - 1 < N; firstCol += 1) {
-				
-				int lastRow = firstRow + K - 1; 
-				int lastCol = firstCol + K - 1;
-				
-				// 해당 영역 내부에 존재하는 폐기물의 수를 계산한다 
-				int numberOfWastes = 0;
-				
-				for (int r = firstRow; r <= lastRow; r += 1) {
-					for (int c = firstCol; c <= lastCol; c += 1) {
-						if (wastes[r][c] == EXISTS) {
-							numberOfWastes += 1;
-						}
-					}
+
+	/**
+	 * 괄호들의 정보가 차례로 배열로 주어질 때, 올바른 괄호 문자열인지 판단하는 함수
+	 *
+	 * @param n             괄호 문자열의 길이
+	 * @param parentheses   괄호 문자에 대한 배열
+	 * @return
+	 */
+	public static boolean isValidParentheses(int n, Parenthesis[] parentheses) {
+		// 현재 짝을 찾지 못한 열린 괄호들
+		Stack<Parenthesis> stack = new Stack<>();
+
+		for (int i = 0; i < n; i++) {
+			// 왼쪽부터 오른쪽의 괄호를 차례로 조회한다.
+			Parenthesis p = parentheses[i];
+
+			if (p.type == Parenthesis.OPEN) {
+				// 열린 괄호라면 짝을 찾을 때 까지 스택에 보관한다
+				stack.push(p);
+			} else if (p.type == Parenthesis.CLOSE) {
+				// 닫힌 괄호 p에 대하여
+
+				if (stack.size() > 0 && stack.peek().type == Parenthesis.OPEN) {
+					// 가장 마지막에 추가된 열린 괄호와 짝을 맞출 수 있으므로 제거한다
+					stack.pop();
+				} else {
+					// 짝을 맞출 수 있는 열린 괄호가 없다면 올바르지 않은 괄호 문자열이다.
+					return false;
 				}
-				
-				// 최소값을 갱신한다.
-				answer = Math.min(numberOfWastes, answer);
 			}
 		}
-		
-		System.out.println(answer);
+
+		if (stack.size() > 0) {
+			// 아직 스택에 짝을 찾지 못한 열린 괄호가 남아있다.
+			return false;
+		}
+
+		return true;
 	}
-	
+
+	public static void testCase(int caseIndex) {
+		String input = scanner.next();
+		int n = input.length();
+
+		Parenthesis[] parentheses = new Parenthesis[n];
+
+		for (int i = 0; i < n; i++) {
+			parentheses[i] = new Parenthesis(i, input.charAt(i));
+		}
+
+		boolean isValid = isValidParentheses(n, parentheses);
+
+		if (isValid) {
+			System.out.println("YES");
+		} else {
+			System.out.println("NO");
+		}
+	}
+
 	public static void main(String[] args) throws Exception {
 		int caseSize = scanner.nextInt();
-		
+
 		for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1) {
 			testCase(caseIndex);
 		}
-		
 	}
-	
+
+}
+
+class Parenthesis {
+	public static final boolean OPEN = true;
+	public static final boolean CLOSE = false;
+
+	public final boolean type;  // 열린 괄호면 true, 닫힌 괄호면 false
+	public final int index;     // 해당 괄호의 인덱스
+
+	public Parenthesis(int index, boolean type) {
+		this.index = index;
+		this.type = type;
+	}
+
+	public Parenthesis(int index, char c) {
+		this.index = index;
+		if (c == '(') {
+			this.type = OPEN;
+		} else {
+			this.type = CLOSE;
+		}
+	}
 }

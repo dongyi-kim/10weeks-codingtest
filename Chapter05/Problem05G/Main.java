@@ -5,73 +5,69 @@ import java.util.*;
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
-	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+
+	public static int getMaximumRangeDifference(int n, int k, City[] cities){
+		int answer = 0;
+
+		// 소득이 가장 작은 도시부터 pop되는 우선순위 큐
+		PriorityQueue<City> rangeMinimum = new PriorityQueue<>();
+
+		// 소득이 가장 높은 도시부터 pop되는 우선순위 큐
+		PriorityQueue<City> rangeMaximum = new PriorityQueue<>(Collections.reverseOrder());
 
 
-	public static void testCase(int caseIndex) throws Exception {
-		int N = scanner.nextInt();
+		for(int i = 0 ; i < n ; i+=1){
+			City c = cities[i]; // 각 도시 c에 대하여 차례로
 
-		int[][] map = new int[N][N];
+			// c를 오른쪽 끝으로 하는 k개의 연속된 도시에 대해
+			int rightEnd = i;
+			int leftEnd = rightEnd - k + 1;
 
-		Robot robot = new Robot();
+			// c를 각 우선순위 큐에 추가한다
+			rangeMaximum.add(c);
+			rangeMinimum.add(c);
 
-		int lastIndex = N * N;
-		for (int index = 1; index <= lastIndex; index += 1) {
-			Position2D curPos = robot.getPosition();
-			map[curPos.r][curPos.c] = index;
-
-			if( index == lastIndex ){
-				break;
+			// 최대 혹은 최소 소득을 가진 도시가 검사 범위 밖에 있다면
+			// 불필요한 정보이므로 모두 pop하여 제거한다.
+			while(rangeMaximum.isEmpty() == false
+					&& rangeMaximum.peek().index < leftEnd){
+				rangeMaximum.poll();
 			}
 
-			while(true){
-				Position2D nextPos = robot.getNextPosition();
-				if(isPossible(map, N, nextPos) == true){
-					break;
-				}
-
-				robot.turnNext();
+			while(rangeMinimum.isEmpty() == false
+					&&  rangeMinimum.peek().index < leftEnd){
+				rangeMinimum.poll();
 			}
 
-			robot.goStraight();
-
-			if(robot.getDirection() == 0 || robot.getDirection() == 2){
-				robot.turnNext();
+			if(leftEnd < 0){
+				continue;
 			}
+
+			// 검사 범위 내에 존재하는 최대/최소 소득간의 차이를 계산한다
+			int minIncome = rangeMinimum.peek().income;
+			int maxIncome = rangeMaximum.peek().income;
+			int diff = maxIncome - minIncome;
+
+			// 최대의 차이를 갱신한다
+			answer = Math.max(answer, diff);
 		}
 
-
-		printMap(map, N);
+		return answer;
 	}
 
+	public static void testCase(int caseIndex) {
+		int n = scanner.nextInt();
+		int k = scanner.nextInt();
+		City[] cities = new City[n];
 
-	public static boolean isPossible(int[][] map, int N, Position2D pos){
-		if( pos.r < 0 || pos.r >= N){
-			return false;
+		for(int i = 0 ; i < n ; i += 1){
+			int income = scanner.nextInt();
+			cities[i] = new City(i, income);
 		}
 
-		if( pos.c < 0 || pos.c >= N){
-			return false;
-		}
+		int answer = getMaximumRangeDifference(n, k, cities);
 
-		if(map[pos.r][pos.c] != 0){
-			return false;
-		}
-
-		return true;
-	}
-
-	public static void printMap(int[][] map, int N) throws Exception {
-		for (int r = 0; r < N; r += 1) {
-			for (int c = 0; c < N; c += 1) {
-				if (c > 0) {
-					writer.write(" ");
-				}
-				writer.write(String.valueOf(map[r][c]));
-			}
-			writer.write("\n");
-		}
-		writer.flush();
+		System.out.println(answer);
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -80,66 +76,23 @@ public class Main {
 		for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1) {
 			testCase(caseIndex);
 		}
-
-		writer.flush();
-		writer.close();
 	}
 
 }
 
-class Robot {
-	public static final int[] deltaR = new int[]{0, 1, 1, -1};
-	public static final int[] deltaC = new int[]{1, -1, 0, 1};
 
-	private int direction;
-	private Position2D position;
+class City implements  Comparable<City>{
+	public final int index;     // 도시의 인덱스
+	public final int income;    // 해당 도시의 소득
 
-	public Robot() {
-		this.position = new Position2D(0, 0);
-		this.direction = 0;
+	public City(int index, int income){
+		this.index = index;
+		this.income = income;
 	}
 
-	public void goStraight() {
-		this.position = getNextPosition();
-	}
-
-	public Position2D getNextPosition() {
-		int newR = position.r + deltaR[direction];
-		int newC = position.c + deltaC[direction];
-
-		Position2D newPosition = new Position2D(newR, newC);
-		return newPosition;
-	}
-
-	public Position2D getPosition() {
-		return this.position;
-	}
-
-	public int getDirection() {
-		return this.direction;
-	}
-
-	public void turnNext() {
-		this.direction = (this.direction + 1) % deltaC.length;
-	}
-}
-
-class Position2D {
-	public final int r;
-	public final int c;
-
-	public Position2D(int r, int c) {
-		this.r = r;
-		this.c = c;
-	}
-
-	public static boolean isInside(Position2D pos, int rowSize, int columnSize) {
-		if (pos.r < 0 || pos.r >= rowSize) {
-			return false;
-		}
-		if (pos.c < 0 || pos.r >= columnSize) {
-			return false;
-		}
-		return true;
+	@Override
+	public int compareTo(City o) {
+		// 소득에 대해 우선순위를 가지도록 대소관계를 정의해준다
+		return this.income - o.income;
 	}
 }

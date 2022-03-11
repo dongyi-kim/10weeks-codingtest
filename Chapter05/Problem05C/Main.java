@@ -5,47 +5,69 @@ import java.util.*;
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
-	public static final int[] deltaR = { -1, -1, -1, 0, 0, 1, 1, 1 };
-	public static final int[] deltaC = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
+	/**
+	 * 왼쪽에서 오른쪽으로 차례로 세워진 히스토그램들 내부에 만들 수 있는
+	 * 최대의 직사각형 넓이를 계산하는 함수
+	 *
+	 * @param n             히스토그램의 수
+	 * @param histograms    히스토그램이 차례로 저장된 배열
+	 * @return
+	 */
+	public static long getLargestRectangleArea(int n, Histogram[] histograms) {
+		long answer = 0;    // 최대 직사각형의 넓이
+
+		// 현재 우측으로 확장 가능성이 있는 히스토그램들
+		Stack<Histogram> continuedHistograms = new Stack<>();
+
+		// 구현상 편의를 위해 가장 왼쪽에 높이 0까지 가상의 히스토그램 추가
+		continuedHistograms.push( new Histogram(-1, 0) );
+		for(int i = 0 ; i < n + 1 ; i++) {
+			// 왼쪽부터 오른쪽 히스토그램까지 차례로
+			Histogram h;
+			if( i < n ){
+				h = histograms[i];
+			}else{ // if ( i == n )
+				// 구현상 편의를 위해 가장 오른쪽에 높이 0까지 가상의 히스토그램 추가
+				h = new Histogram(n,0);
+			}
+
+			// 이전에 확장중이던 히스토그램들 중, h보다 높이가 높은 히스토그램들은
+			// 더 이상 확장될 수 없다 => 최대 넓이가 결정된다.
+			while ( continuedHistograms.size() > 1
+					&& continuedHistograms.peek().height >= h.height ){
+				// 확장중이던 히스토그램
+				Histogram lh = continuedHistograms.pop();
+
+				// 그 이전의 히스토그램 (왼쪽 확장의 끝)
+				Histogram bh = continuedHistograms.peek();
+
+				// 현재 추가된 h의 바로 왼쪽까지 확장중이었다.
+				long width = Math.abs(h.leftX - bh.rightX);
+				long height = lh.height;
+				long area =  width * height;
+
+				// 최대 값 갱신
+				answer = Math.max(answer, area);
+			}
+
+			// h를 새로이 추가한다
+			continuedHistograms.push(h);
+		}
+
+		return answer;
+	}
 
 	public static void testCase(int caseIndex) {
-		int N = scanner.nextInt();
-		int M = scanner.nextInt();
+		int n = scanner.nextInt();
 
-		GameMap gameMap = new GameMap(N, N);
-
-		for (int r = 0; r < N; r += 1) {
-			for (int c = 0; c < N; c += 1) {
-				int buildings = scanner.nextInt();
-				gameMap.setBuildingsAt(r, c, buildings);
-			}
+		Histogram[] histograms = new Histogram[n];
+		for(int i = 0 ; i < n ; i ++) {
+			int height = scanner.nextInt();
+			histograms[i] = new Histogram(i, height);
 		}
 
-		int answer = 0;
-
-		for(int i = 0 ; i < M ; i += 1){
-			int r = scanner.nextInt() - 1;
-			int c = scanner.nextInt() - 1;
-
-			int buildings = 0;
-			buildings += gameMap.getBuildingsAt(r, c);
-
-			for(int di = 0 ; di < deltaR.length; di += 1){
-				for(int length = 1; length <= N; length += 1){
-					int newR = r + deltaR[di] * length;
-					int newC = c + deltaC[di] * length;
-					if(gameMap.isInside(newR, newC) == false){
-						break;
-					}
-
-					buildings += gameMap.getBuildingsAt(newR, newC);
-				}
-			}
-
-			answer = Math.max(answer, buildings);
-		}
-
+		long answer = getLargestRectangleArea(n, histograms);
 		System.out.println(answer);
 	}
 
@@ -59,36 +81,15 @@ public class Main {
 
 }
 
-class GameMap{
-	public final int rows;
-	public final int columns;
-	private final int[][] buildings;
+class Histogram{
+	public final int height;    // 히스토그램의 높이
+	public final int leftX;     // 인덱스 혹은 히스토그램의 왼쪽 변의 x 좌표
+	public final int rightX;    // 히스토그램의 오른쪽 변의 x좌표
 
-	public GameMap(int rows, int columns){
-		this.rows = rows;
-		this.columns = columns;
-		this.buildings = new int[rows][columns];
+	public Histogram(int index, int height) {
+		this.leftX = index;
+		this.rightX = this.leftX + 1;   // 각 히스토그램은 너비가 1이므로
+		this.height = height;
 	}
-
-	public int getBuildingsAt(int r, int c){
-		if(this.isInside(r, c) == false)
-			return 0;
-
-		return this.buildings[r][c];
-	}
-
-	public void setBuildingsAt(int r, int c, int value){
-		this.buildings[r][c] = value;
-	}
-
-	public boolean isInside(int r, int c){
-		if(r < 0 || r >= this.rows)
-			return false;
-		if(c < 0 || c >= this.columns)
-			return false;
-		return true;
-	}
-
-
 
 }

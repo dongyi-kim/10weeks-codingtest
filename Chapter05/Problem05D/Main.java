@@ -5,136 +5,84 @@ import java.util.*;
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
-	
-	public static void testCase(int caseIndex) {
-		int N = scanner.nextInt();
-		
-		GameMap gameMap = new GameMap(N, N);
-		
-		for (int r = 0; r < N; r += 1) {
-			for (int c = 0; c < N; c += 1) {
-				int buildings = scanner.nextInt();
-				gameMap.setBuildingsAt(r, c, buildings);
-			}
+
+	/**
+	 * ì¡°ì„¸í¼ìŠ¤ ê²Œì„ì„ ìˆ˜í–‰í•˜ì—¬ ê° í”Œë ˆì´ì–´ê°€ ì œê±°ëœ ìˆœì„œë¥¼ ë¦¬ìŠ¤íŠ¸ë¡œ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
+	 *
+	 * @param n         í”Œë ˆì´ì–´ì˜ ìˆ˜
+	 * @param m         ë§¤ í„´ë§ˆë‹¤ ê±´ë„ˆ ë›¸ ì‚¬ëŒì˜ ìˆ˜
+	 * @param players   ì¢Œì„ì— ì•‰ì•„ìˆëŠ” ìˆœì„œëŒ€ë¡œ ì£¼ì–´ì§€ëŠ” í”Œë ˆì´ì–´ ì •ë³´
+	 * @return
+	 */
+	public static ArrayList<Player> getDeadPlayersList(int n, int m, Player[] players){
+		// í˜„ì¬ ê²Œì„ì—ì„œ ì œì™¸ëœ í”Œë ˆì´ì–´ë“¤ì˜ ë¦¬ìŠ¤íŠ¸
+		ArrayList<Player> deadPlayers = new ArrayList<>();
+
+		// ì•„ì§ ê²Œì„ì—ì„œ ì œì™¸ë˜ì§€ ì•ŠëŠ” í”Œë ˆì´ì–´ë“¤ì˜ ë¦¬ìŠ¤íŠ¸
+		Queue<Player> playerQueue = new LinkedList<>();
+		for(int i = 0 ; i < n; i+= 1){
+			playerQueue.add(players[i]);
 		}
-		
-		int answer = 0;
-		
-		for (int r = 0; r < N; r += 1) {
-			for (int c = 0; c < N; c += 1) {
-				// ÇØ´ç À§Ä¡¿¡¼­ ¹æ¾îÇÒ ¼ö ÀÖ´Â ¸ğµç °Ç¹°ÀÇ ¼ö
-				int numberOfBuildings = gameMap.getTotalPointAt(r, c);
-				
-				// ÃÖ´ë°ªÀ» °»½ÅÇÑ´Ù
-				answer = Math.max(answer, numberOfBuildings);
+
+		for(int i = 0 ; i < n ; i++){
+			// (m-1)ëª…ì˜ ì‚¬ëŒì„ ê±´ë„ˆë›´ë‹¤.
+			int jump = 1 + (m-1) % playerQueue.size();
+			for(int j = 0; j<jump - 1; j+=1){
+				Player p = playerQueue.poll();
+				playerQueue.add(p);
 			}
+
+			// më²ˆì§¸ ì‚¬ëŒì€ ê²Œì„ì—ì„œ ì œì™¸í•œë‹¤.
+			Player dead = playerQueue.poll();
+
+			// ì œì™¸ ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€í•œë‹¤.
+			deadPlayers.add(dead);
 		}
-		
-		System.out.println(answer);
+
+		return deadPlayers;
 	}
-	
+
+	public static void testCase(int caseIndex) throws Exception{
+		int n = scanner.nextInt();
+		int m = scanner.nextInt();
+
+		Player[] players = new Player[n];
+		for(int i = 0 ; i < n ; i++)
+		{
+			players[i] = new Player(i+1);
+		}
+
+		ArrayList<Player> deadPlayers = getDeadPlayersList(n,m, players);
+
+		// ì¶œë ¥ì†ë„ ê°œì„ ì„ ìœ„í•´ StringBuilderë¥¼ ì‚¬ìš©í•œë‹¤.
+		// í•˜ë‚˜ì˜ í…ŒìŠ¤íŠ¸ì¼€ì´ìŠ¤ì— ëŒ€í•œ ì¶œë ¥(í•œ ì¤„)ì„ ìŠ¤íŠ¸ë§ ë¹Œë”ë¡œ ë§Œë“ ë‹¤
+		StringBuilder builder = new StringBuilder();
+		for(int i = 0 ; i < n ; i ++){
+			if( i > 0 ){
+				builder.append(" ");
+			}
+
+			Player p = deadPlayers.get(i);
+			builder.append(p.index);
+		}
+		// ì •ë‹µì„ ì¶œë ¥í•œë‹¤
+		System.out.println(builder.toString());
+	}
+
 	public static void main(String[] args) throws Exception {
 		int caseSize = scanner.nextInt();
-		
+
 		for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1) {
 			testCase(caseIndex);
 		}
 	}
-	
+
 }
 
-class GameMap {
-	public final int rows;
-	public final int columns;
-	private final int[][] buildings;   // buildings[r][c] := (r, c)¿¡ Á¸ÀçÇÏ´Â °Ç¹° ¼ö 
-	
-	private final int[] rowSums;    //rowSums[r] := rÇà¿¡ Á¸ÀçÇÏ´Â °Ç¹°ÀÇ ¼ö
-	private final int[] colSums;    //colSums[c] := c¿­¿¡ Á¸ÀçÇÏ´Â °Ç¹°ÀÇ ¼ö
-	private final int[] diagonalSumA; //diagonalSumA[k] := k¹øÂ° ¢× ¹æÇâ ´ë°¢¼±»ó¿¡ Á¸ÀçÇÏ´Â °Ç¹°ÀÇ ¼ö
-	private final int[] diagonalSumB; //diagonalSumB[k] := k¹øÂ° ¢Ù ¹æÇâ ´ë°¢¼±»ó¿¡ Á¸ÀçÇÏ´Â °Ç¹°ÀÇ ¼ö
-	
-	
-	public GameMap(int rows, int columns) {
-		this.rows = rows;
-		this.columns = columns;
-		this.buildings = new int[rows][columns];
-		this.rowSums = new int[rows];
-		this.colSums = new int[columns];
-		this.diagonalSumA = new int[rows + columns];
-		this.diagonalSumB = new int[rows + columns];
-	}
-	
-	/**
-	 * (r, c)Ä­¿¡ Á¸ÀçÇÏ´Â °Ç¹°ÀÇ ¼ö
-	 *
-	 * @param r
-	 * @param c
-	 * @return ÇØ´ç Ä­ÀÇ °Ç¹° ¼ö
-	 */
-	public int getBuildingsAt(int r, int c) {
-		if (this.isInside(r, c) == false)
-			return 0;
-		
-		return this.buildings[r][c];
-	}
-	
-	/**
-	 * (r, c)Ä­¿¡ Á¸ÀçÇÏ´Â °Ç¹° ¼ö¸¦ ¼öÁ¤ÇÏ´Â ¸Ş¼Òµå
-	 *
-	 * @param r
-	 * @param c
-	 * @param value Á¸ÀçÇÏ´Â °Ç¹° ¼ö
-	 */
-	public void setBuildingsAt(int r, int c, int value) {
-		if (this.isInside(r, c) == false) {
-			return;
-		}
-		
-		int origin = getBuildingsAt(r, c);  // ¼öÁ¤ Àü °Ç¹° ¼ö
-		int delta = value - origin;         // ¼öÁ¤ Àü/ÈÄ °Ç¹°¼öÀÇ Â÷
-		
-		this.buildings[r][c] = value; // ÇØ´ç Ä­ÀÇ °Ç¹° ¼ö Á¤º¸ ¼öÁ¤ 
-		this.rowSums[r] += delta;       // ÇØ´ç ÇàÀÇ ÃÑ °Ç¹° ¼ö ¼öÁ¤ 
-		this.colSums[c] += delta;       // ÇØ´ç ¿­ÀÇ ÃÑ °Ç¹° ¼ö ¼öÁ¤
-		this.diagonalSumA[r + c] += delta;  // ÇØ´ç ´ë°¢¼±ÀÇ ÃÑ °Ç¹° ¼ö ¼öÁ¤ 
-		this.diagonalSumB[c - r + rows - 1] += delta; // ÇØ´ç ´ë°¢¼±ÀÇ ÃÑ °Ç¹° ¼ö ¼öÁ¤ 
-	}
-	
-	
-	/**
-	 * (r, c)Ä­¿¡ Å¸¿ö¸¦ ¼¼¿üÀ» ½Ã ¾òÀ» ¼ö ÀÖ´Â ÃÑ Á¡¼ö¸¦ °è»êÇÏ´Â ¸Ş¼Òµå
-	 *
-	 * @param r
-	 * @param c
-	 * @return ÇØ´ç ÁöÁ¡¿¡¼­ ¹æ¾î °¡´ÉÇÑ °Ç¹°ÀÇ ¼ö
-	 */
-	public int getTotalPointAt(int r, int c) {
-		int buildings = 0;
-		buildings += this.rowSums[r];   // °¡·Î ¹æÇâÀ¸·Î ¹æ¾î °¡´ÉÇÑ °Ç¹° ¼ö
-		buildings += this.colSums[c];   // ¼¼·Î ¹æÇâÀ¸·Î ¹æ¾î °¡´ÉÇÑ °Ç¹° ¼ö
-		buildings += this.diagonalSumA[r + c];  // ¢× ¹æÇâÀ¸·Î ¹æ¾î °¡´ÉÇÑ °Ç¹° ¼ö
-		buildings += this.diagonalSumB[c - r + rows - 1]; // ¢Ù ¹æÇâÀ¸·Î ¹æ¾î °¡´ÉÇÑ °Ç¹° ¼ö
-		
-		// ÁßÁ¡ÀÇ °æ¿ì ³× ¹ø Áßº¹À¸·Î °è»êµÇ¾ú±â ¶§¹®¿¡ °¨»êÇØÁØ´Ù.
-		buildings -= getBuildingsAt(r, c) * 3;
-		
-		return buildings;
-	}
-	
-	
-	/**
-	 * ÇØ´ç Ä­ÀÌ Áöµµ ³»ºÎ¿¡ Á¸ÀçÇÏ´Â Ä­ÀÎÁö °Ë»çÇÏ´Â ¸Ş¼Òµå
-	 *
-	 * @param r
-	 * @param c
-	 * @return (r, c)°¡ Áöµµ »ó¿¡ À¯È¿ÇÑ Ä­ÀÌ¸é true, ¾Æ´Ï¸é false
-	 */
-	public boolean isInside(int r, int c) {
-		if (r < 0 || r >= this.rows)
-			return false;
-		if (c < 0 || c >= this.columns)
-			return false;
-		return true;
+class Player{
+	public final int index;
+
+	public Player(int index){
+		this.index = index;
 	}
 }
-
