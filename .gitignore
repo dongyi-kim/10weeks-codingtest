@@ -1,16 +1,6 @@
-# data files
-*.txt
-*.dat
-*.data
-*.in
-*.out
-*.input
-*.output
+*.zip
 
 #data folders
-*/data/
-gen.py
-
 .vscode
 .idea
 

@@ -1,0 +1,6 @@
+5
+DO
+DO
+HI
+HI
+BYE
