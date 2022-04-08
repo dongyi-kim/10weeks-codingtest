@@ -13,7 +13,7 @@ def testcase(tidx, level, n, name_cnt):
             name = random.choice(names)
             if name not in cnt:
                 cnt[name] = 0
-            cnt[name] += 1
+            cnt[name] = cnt[name] + 1
             max_cnt = max(max_cnt, cnt[name])
             f.write("%s\n" % name )
     
@@ -27,8 +27,6 @@ def testcase(tidx, level, n, name_cnt):
     with open("output.%02d.txt" % tidx, "w") as f:
         f.write("%d\n" % (max_cnt))
         f.write("%s" % (' '.join(cand)))
-        for name in cand:
-            f.write("%s " % name)
 
 for tidx in range(2, 51):
     level = 1 + (tidx-1)//5 # 1 ~ 10 
