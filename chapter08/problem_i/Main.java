@@ -1,168 +1,114 @@
 import java.io.*;
-import java.util.*;
 import java.lang.*;
+import java.util.*;
+
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
+	public static final int MAX_NUMBER = 10000;
+
+	public static final boolean isPrime[] = new boolean[MAX_NUMBER + 1];
 
 	/**
-	 * @brief   DFS기법으로 경우의 수를 탐색하여 스도쿠 판을 채우는 함수
-	 *          채울 방법이 존재한다면 해당 스도쿠 판을 2차원 배열 형태로 반환한다
+	 * "number"에서 한 글자를 변경해 만들 수 있는 모든 1000~9999사이의 소수를 반환해주는 함수
 	 *
-	 * @param depth     현재 탐색의 깊이
-	 * @param sudoku    수도쿠 게임 정보 객체
-	 * @return          채울 방법이 존재한다면 해당 판을, 그렇지 않다면 null을 반환한다
+	 * @param number
+	 * @return
 	 */
-	public static int[][] fillSudoku(int depth, Sudoku sudoku){
-		if(depth > 81){
-			return sudoku.copyBoard();
+	public static ArrayList<Integer> getAdjacentPrimeNumbers(int number){
+		ArrayList<Integer> adjacentPrimeNumbers = new ArrayList<>();
+
+		int[] orgDigits = new int[4];
+		orgDigits[0] = number / 1000;
+		orgDigits[1] = (number % 1000) / 100;
+		orgDigits[2] = (number % 100) / 10;
+		orgDigits[3] = (number % 10);
+
+		for(int pos = 0 ; pos < 4 ; pos += 1){
+			int[] newDigits = orgDigits.clone();
+			for(int digit = 0 ; digit <= 9; digit += 1){
+				newDigits[pos] = digit;
+
+				int newInteger = newDigits[0] * 1000 + newDigits[1] * 100 + newDigits[2] * 10 + newDigits[3];
+				if(1000 <= newInteger && newInteger <= 9999 && isPrime[newInteger] == true && newInteger != number){
+					adjacentPrimeNumbers.add(newInteger);
+				}
+			}
 		}
 
-		int r = (depth-1) / 9 + 1;
-		int c = (depth-1) % 9 + 1;
+		return adjacentPrimeNumbers;
+	}
 
-		int[][] answerBoard = null;
+	public static void testCase(int caseIndex) {
+		int origin = scanner.nextInt();
+		int dest = scanner.nextInt();
 
-		if(sudoku.isEmpty(r, c) == false){
-			// 이미 해당 칸에 숫자가 채워져 있는 경우
-			// 다음 칸부터 다시 탐색을 시작한다
-			answerBoard = fillSudoku(depth+1, sudoku);
+		boolean[] visited = new boolean[MAX_NUMBER];
+		int[] distance = new int[MAX_NUMBER];
+
+		Queue<State> bfsQueue = new LinkedList<>();
+		State initialState = new State( origin, 1 );
+		bfsQueue.add(initialState);
+
+		while(!bfsQueue.isEmpty()){
+			State current = bfsQueue.poll();
+
+			if(visited[current.value] == true){
+				continue;
+			}
+
+			visited[current.value] = true;
+			distance[current.value] = current.depth - 1;
+
+			ArrayList<Integer> nextIntegers = getAdjacentPrimeNumbers(current.value);
+			for(int next : nextIntegers){
+				if(visited[next] == false){
+					State nextState = new State(next, current.depth + 1);
+					bfsQueue.add(nextState);
+				}
+			}
+		}
+
+		if(visited[dest] == false){
+			System.out.println("Impossible");
 		}else{
-			// 해당 칸이 비어있는 경우, 1~9사이의 숫자들 중 하나를 선택해 시도해본다
-			for(int value = 1; value <= 9 ; value += 1){
-				// 현재 해당 칸에 넣을 수 있는 숫자라면
-				if(sudoku.isSettable(r, c, value)){
-					// 해당 칸에 숫자를 넣고
-					sudoku.setBoard(r, c, value);
-
-					// 그 이후를 탐색해본다
-					answerBoard = fillSudoku(depth+1, sudoku);
-
-					// 탐색이 종료된 후 다시 해당 숫자를 제거해준다 (추가 탐색을 위해)
-					sudoku.clearBoard(r, c);
-				}
-				// 이미 정답을 찾았다면 종료한다
-				if(answerBoard != null){
-					break;
-				}
-			}
+			int answer = distance[dest];
+			System.out.println(answer);
 		}
-
-		return answerBoard;
 	}
 
-	public static void main(String[] args) {
-		// 스도쿠 객체 선언
-		Sudoku sudoku = new Sudoku();
 
-		// 스도쿠 판 초기 상태를 입력받는다
-		for (int r = 1; r <= 9; r += 1) {
-			for (int c = 1; c <= 9; c += 1) {
-				int value = scanner.nextInt();
-				sudoku.setBoard(r, c, value);
+	public static void fillSieve(){
+		Arrays.fill(isPrime, true);
+		isPrime[0] = isPrime[1] = false;
+
+		for(int p = 2; p <= MAX_NUMBER; p += 1){
+			if(isPrime[p] == false){
+				continue;
+			}
+
+			for(int mul = p * p ; mul <= MAX_NUMBER; mul += p){
+				isPrime[mul] = false;
 			}
 		}
-
-		// DFS로 가능한 방법을 찾는다
-		int[][] answer = fillSudoku(1, sudoku);
-
-		// 정답을 출력한다
-		StringBuilder stringBuilder = new StringBuilder();
-		for (int r = 1; r <= 9; r += 1) {
-			for (int c = 1; c <= 9; c += 1) {
-				if (c > 0) {
-					stringBuilder.append(" ");
-				}
-				stringBuilder.append(answer[r][c]);
-			}
-			stringBuilder.append("\n");
-		}
-
-		String output = stringBuilder.toString();
-		System.out.print(output);
 	}
+
+	public static void main(String[] args) throws Exception {
+		int caseSize = scanner.nextInt();
+
+		fillSieve();
+		for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1) {
+			testCase(caseIndex);
+		}
+	}
+
 }
+class State {
+	public final int value;
+	public final int depth;
 
-class Sudoku {
-	public static final int EMPTY = 0;
-
-	private int[][] board;
-	private int[][] rowFrequency;
-	private int[][] columnFrequency;
-	private int[][] groupFrequency;
-
-
-	public Sudoku() {
-		this.board = new int[10][10];
-		this.rowFrequency = new int[10][10];
-		this.columnFrequency = new int[10][10];
-		this.groupFrequency = new int[10][10];
-	}
-
-	// r행 c열 칸에 value숫자를 채워넣는 메소드
-	public void setBoard(int r, int c, int value) {
-		// 기존에 있던 숫자는 제거한다
-		clearBoard(r, c);
-
-		// 빈도수를 갱신해준다
-		int g = ((r - 1) / 3) * 3 + (c - 1) / 3 + 1;
-
-		this.rowFrequency[r][value] += 1;
-		this.columnFrequency[c][value] += 1;
-		this.groupFrequency[g][value] += 1;
-		this.board[r][c] = value;
-	}
-
-	// r행 c열에 있던 칸을 지우고 빈 칸으로 만든다
-	public void clearBoard(int r, int c) {
-		// 이미 비어져 있다면 스킵한다
-		if (board[r][c] == EMPTY) {
-			return;
-		}
-
-		// 기존에 있던 숫자의 빈도수를 감소시키고
-		int value = board[r][c];
-		int g = ((r - 1) / 3) * 3 + (c - 1) / 3 + 1;
-
-		this.rowFrequency[r][value] -= 1;
-		this.columnFrequency[c][value] -= 1;
-		this.groupFrequency[g][value] -= 1;
-
-		// 빈 칸으로 채운다
-		this.board[r][c] = EMPTY;
-	}
-
-	// r행 c열에 놓인 숫자를 반환한다
-	public int getBoard(int r, int c) {
-		return board[r][c];
-	}
-
-	// r행 c열에 value라는 숫자를 스도쿠 규칙상 둘 수 있는지 검사하는 함수
-	public boolean isSettable(int r, int c, int value) {
-		if(isEmpty(r,c) == false){
-			return false;
-		}
-
-		int g = ((r - 1) / 3) * 3 + (c - 1) / 3 + 1;
-
-		return this.rowFrequency[r][value] == 0
-				&& this.columnFrequency[c][value] == 0
-				&& this.groupFrequency[g][value] == 0;
-	}
-
-	// r행 c열 칸이 비어있는지 검사하는 함수
-	public boolean isEmpty(int r, int c){
-		return this.board[r][c] == EMPTY;
-	}
-
-	// 현재 스도쿠 보드의 상태를 2차원 배열 형태로 저장하여 반환해주는 함수
-	public int[][] copyBoard(){
-		int[][] copiedBoard = new int[10][10];
-		for(int r = 1; r <= 9; r += 1){
-			for(int c = 1; c<= 9; c += 1){
-				copiedBoard[r][c] = this.board[r][c];
-			}
-		}
-		return copiedBoard;
+	public State(int value, int depth) {
+		this.value = value;
+		this.depth = depth;
 	}
 }
