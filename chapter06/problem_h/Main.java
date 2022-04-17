@@ -3,141 +3,112 @@ import java.lang.*;
 import java.util.*;
 
 
-class SortingAlgorithm {
+class Solution {
 
-	/**
-	 * @brief   arr[left] ~ arr[right] 범위에서 원소 하나를 피벗으로 선택하는 함수
-	 *
-	 * @param arr
-	 * @param left
-	 * @param right
-	 * @return          피봇으로 선정된 원소의 인덱스를 반환한다
-	 */
-	public static int getPivotIndex(int[] arr, int left, int right) {
-		int a = left;
-		int b = right;
-		int c = (left + right) / 2;
-
-		if (arr[a] <= arr[b] && arr[b] <= arr[c]) {
-			return b;
-		} else if (arr[a] <= arr[c] && arr[c] <= arr[b]) {
-			return c;
-		}
-		return a;
+	public static long getLargestRectangleArea(Histogram[] histograms) {
+		return getLargestRectangleArea(histograms, 0, histograms.length - 1);
 	}
 
 	/**
-	 * @brief     배열의 두 원소 arr[indexA] 와 arr[indexB]를 swap해주는 함수
+	 * @brief           주어진 범위에 대해 가장 큰 직사각형의 크기를 반환하는 함수
 	 *
-	 * @param arr
-	 * @param indexA
-	 * @param indexB
-	 */
-	public static void swap(int[] arr, int indexA, int indexB) {
-		int temp = arr[indexA];
-		arr[indexA] = arr[indexB];
-		arr[indexB] = temp;
-	}
-
-	/**
-	 * @brief   arr[left] ~ arr[[right] 범위를 피봇 기준으로 좌우를 나눈다
-	 *          피봇의 왼쪽은 피봇 보다 작은 원소만, 피봇의 오른쪽은 피봇보다 큰 원소만 남긴다
-	 *
-	 * @param arr
+	 * @param histograms
 	 * @param left
 	 * @param right
-	 * @param pivotIndex
-	 * @return  피봇이 위치하는 중간 지점의 인덱스를 반환한다
+	 * @return          histograms[left] ~ histograms[right] 범위의 막대 내에 존재할 수 있는 가장 큰 직사각형의 크기
 	 */
-	public static int divideArrayByPivot(int[] arr, int left, int right, int pivotIndex) {
-		if (left >= right) {
-			return left;
+	public static long getLargestRectangleArea(Histogram[] histograms, int left, int right) {
+		if (left > right) {
+			// 히스토그램이 없다면 넓이는 0이 된다
+			return 0;
+		} else if (left == right) {
+			// 히스토그램 하나라면 그 자체가 된다
+			return histograms[left].height;
 		}
 
-		// 피봇 값은 저장하고, 배열에서의 위치를 가장 앞(arr[left])로 옮긴다.
-		int pivot = arr[pivotIndex];
-		swap(arr, left, pivotIndex);
+		// 영역을 나눌 중간 지점 인덱스
+		int mid = (left + right) / 2;
 
-		// 이후 arr[left+1] ~ arr[right]부분을 분할한다
+		// 좌 우를 나누어 해당 영역만으로 계산한 정답을 각각 계산한다
+		long leftMax = getLargestRectangleArea(histograms, left, mid);
+		long rightMax = getLargestRectangleArea(histograms, mid + 1, right);
 
-		// mid := 피벗보다 작은 원소가 존재하는 범위의 가장 오른쪽 인덱스
-		int mid = left;
-		for (int i = left + 1; i <= right; i += 1) {
-			// 뒷 부분에서 피벗보다 작은 원소가 등장한 경우
-			if (arr[i] < pivot) {
-				// arr[mid]와 자리를 바꾼다
-				swap(arr, mid + 1, i);
+		// 두 범위들 중 더 작은 값을 저장해둔다
+		long globalMax = Math.max(leftMax, rightMax);
 
-				// mid는 증가시킨다 <=> 더 작은 원소의 수가 늘었으므로
-				mid += 1;
+		// 좌우 범위에 걸친 범위 [ begin, end ] 정보를 저장한다
+		int begin = mid;
+		int end = mid+1;
+
+		// 초기 영역의 높이와 넓이를 저장해 계산한다
+		int height = Math.min( histograms[mid].height , histograms[mid+1].height );
+		globalMax = Math.max(globalMax, height * 2);
+
+		// 좌/우로 넓이를 늘려가며 확장해나간다
+		int maxWidth = right - left + 1;
+		for (int width = 3; width <= maxWidth; width += 1) {
+			// 좌/우 각각 해당 방향으로 범위를 확대했을 때 만날 수 있는 막대의 높이를 구한다
+			// 더 이상 해당 방향으로 확대할 수 없다면 -1을 저장한다
+			int lnh = (left < begin) ? histograms[begin - 1].height : -1;
+			int rnh = (end < right) ? histograms[end + 1].height : -1;
+
+
+			if (lnh >= rnh) {
+				// 왼쪽으로 확장이 더 유리한 경우
+				begin -= 1;
+				height = Math.min(height, histograms[begin].height);
+			} else {
+				// 오른쪽으로 확장이 더 유리한 경우
+				end += 1;
+				height = Math.min(height, histograms[end].height);
 			}
+
+			// 이 때의 넓이를 계산하고 갱신한다
+			long area = (long) height * width;
+			globalMax = Math.max(globalMax, area);
 		}
 
-		// arr[left]에 보관중이던 피벗을 분할점(arr[mid])로 다시 가져온다
-		swap(arr, mid, left);
-
-		// 분할점은 mid가 된다.
-		return mid;
+		return globalMax;
 	}
+}
 
-	/**
-	 * @brief   quickSort 함수의 축약형
-	 * @param arr
-	 */
-	public static void quickSort(int[] arr) {
-		quickSort(arr, 0, arr.length - 1);
-	}
+class Histogram {
+	public final int height;    // 히스토그램의 높이
+	public final int leftX;     // 인덱스 혹은 히스토그램의 왼쪽 변의 x 좌표
+	public final int rightX;    // 히스토그램의 오른쪽 변의 x좌표
 
-
-	/**
-	 * @brief   arr[left] ~ arr[right] 범위를 정렬해주는 함수
-	 *
-	 * @param arr
-	 * @param left
-	 * @param right
-	 */
-	public static void quickSort(int[] arr, int left, int right) {
-		if (left >= right) {
-			return;
-		}
-
-		// 전체 범위를 나눌 피벗을 찾는다
-		int pivotIndex = getPivotIndex(arr, left, right);
-
-		// 피벗 기준으로 전체 범위를 좌우로 나누고 그 분할점을 찾는다
-		int mid = divideArrayByPivot(arr, left, right, pivotIndex);
-		pivotIndex = mid;   // 피벗은 분할점에 존재한다
-
-		// 피벗 기준으로 좌우를 나누어 별도로 정렬한다
-		quickSort(arr, left, pivotIndex - 1);
-		quickSort(arr, pivotIndex + 1, right);
+	public Histogram(int index, int height) {
+		this.leftX = index;
+		this.rightX = this.leftX + 1;   // 각 히스토그램은 너비가 1이므로
+		this.height = height;
 	}
 
 }
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
-	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+
+
+	public static void testCase(int caseIndex) {
+		int n = scanner.nextInt();
+
+		Histogram[] histograms = new Histogram[n];
+		for (int i = 0; i < n; i++) {
+			int height = scanner.nextInt();
+			histograms[i] = new Histogram(i, height);
+		}
+
+		long answer = Solution.getLargestRectangleArea(histograms);
+		System.out.println(answer);
+	}
 
 	public static void main(String[] args) throws Exception {
-		int N = scanner.nextInt();
+		int caseSize = scanner.nextInt();
 
-		int[] arr = new int[N];
-		for (int i = 0; i < N; i += 1) {
-			arr[i] = scanner.nextInt();
+		for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1) {
+			testCase(caseIndex);
 		}
-
-		SortingAlgorithm.quickSort(arr);
-
-		for (int i = 0; i < N; i += 1) {
-			if (i > 0) {
-				writer.write(" ");
-			}
-			writer.write(String.valueOf(arr[i]));
-		}
-
-		writer.flush();
-		writer.close();
 	}
 
 }
+
