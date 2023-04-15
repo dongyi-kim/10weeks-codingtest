@@ -1,20 +1,5 @@
-function getMax(array, length) {
-  var max = 0;
-  for (var i=0; i<length; i++) {
-    if (array[i] >= max)
-      max = array[i];
-  }
-	return max;
-}
+const fs = require('fs');
+const input = fs.readFileSync('/dev/stdin').toString().split('\n');
 
-const input = [];
-require('readline')
-  .createInterface(process.stdin, {})
-  .on('line', function(line) {
-    input.push(line.trim());
-  })
-  .on('close', function() {
-		const length = parseInt(input[0]);
-		const values = input[1].split(" ").map(Number);
-		console.log(getMax(values, length));
-	});
+const answer = Math.max(...input[1].split(" "));
+console.log(answer);
