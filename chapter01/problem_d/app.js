@@ -1,19 +1,7 @@
-const input = [];
-require('readline')
-  .createInterface(process.stdin, {})
-  .on('line', function(line) {
-    input.push(line.trim());
-  })
-  .on('close', function() {
-    const values = input[0].split(" ").map(Number);
-    const array = input[1].split(" ").map(Number);
-    var count = 0;
-    const n = values[0];
-    const m = values[1];
-    const s = values[2];
-    array.forEach(function(height) {
-      if (height == m || height == s)
-        count++;
-    });
-		console.log(count);
-	});
+const fs = require('fs');
+const input = fs.readFileSync('/dev/stdin').toString().split('\n');
+
+const m = input[0].split(" ")[1];
+const s = input[0].split(" ")[2];
+
+console.log(input[1].split(" ").filter((x) => x === m || x === s).length);
