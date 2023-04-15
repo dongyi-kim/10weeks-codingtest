@@ -1,23 +1,5 @@
-function get_sum(data, length)
-{
-  var sum = 0;
+const fs = require('fs');
+const input = fs.readFileSync('/dev/stdin').toString().split('\n');
 
-  for (var i=0; i<length; i++)
-  {
-    sum += data[i];
-  }
-  return sum;
-}
-
-const input = [];
-require('readline')
-  .createInterface(process.stdin, {})
-  .on('line', function(line) {
-    input.push(line.trim());
-  })
-  .on('close', function() {
-    const length = parseInt(input[0]);
-    const data = input[1].split(" ").map(Number);
-    const answer = get_sum(data, length);
-		console.log(answer);
-	});
+const answer = input[1].split(" ").map(Number).reduce((acc, cur) => acc + cur, 0);
+console.log(answer);
