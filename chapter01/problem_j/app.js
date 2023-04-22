@@ -1,20 +1,20 @@
-const input = [];
-require('readline')
-  .createInterface(process.stdin, {})
-  .on('line', function(line) {
-    input.push(line.trim());
-  })
-  .on('close', function() {
-    const n = parseInt(input[0]);
-    const sum = [0];
-		var answer = 0;
-    for (var i=1; i<=n; i++)
-    {
-      sum[i] = sum[i-1] + i;
+const fs = require('fs');
+const input = fs.readFileSync('/dev/stdin').toString().split('\n');
+
+const N = Number(input[0]);
+
+// 등차수열의 합 공식으로 대체
+const getRangeSumFromOne = (i) => ((i * (i + 1)) / 2);
+
+const getAnswer = (N) => {
+    let answer = 0;
+    for(let i =  1; i <= N; i++) {
+        let rangeSum = getRangeSumFromOne(i);
+        answer += rangeSum;
     }
-		for (var i=1; i<=n; i++)
-		{
-			answer += sum[i];
-		}
-		console.log(answer);
-	});
+    return answer;
+};
+
+const answer = getAnswer(N);
+
+console.log(answer);
