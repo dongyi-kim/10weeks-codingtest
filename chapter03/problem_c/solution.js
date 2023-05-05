@@ -5,17 +5,14 @@ const input = (()=>{
     return ()=>stdin[ln++];
 })();
 
-const n = Number(input())
-const data = input().split(" ").map(Number)
-const serial = Array(100001).fill(0)
-const application = []
+const N = Number(input());
+const data = input().split(" ").map(Number);
+const serial = Array(100001).fill(0);
 
-for(let i = 0 ; i < n ; i++){
+for(let i = 0 ; i < data.length ; i++){
     serial[data[i]] += 1;
 }
 
-for(let i = 0 ; i < serial.length ; i++){
-    if(serial[i] === 1) application.push(i)
-}
+const getUniqueElements = serial.flatMap((x, i) => x === 1 ? i : []);
 
-console.log(application.join(" "))
+console.log(getUniqueElements.join(" "));
