@@ -1,37 +1,32 @@
 const fs = require('fs');
-const input = (()=>{
+const input = (() => {
     const stdin = fs.readFileSync('/dev/stdin').toString().split('\n');
-    let ln=0;
-    return ()=>stdin[ln++];
+    let ln = 0;
+    return () => stdin[ln++];
 })();
 
-let answer = '';
-const n = Number(input());
+const T = Number(input());
 const data = [];
-const fibotable = [];
+const FIBONACCI_TABLE = [0, 1];
 
-for(let i = 0 ; i < n ; i++){
+let maxCase = 0;
+
+for (let i = 0; i < T; i++) {
     data[i] = Number(input());
+    if (data[i] > maxCase) {
+        maxCase = data[i];
+    }
 }
 
-const maxIndex = Math.max(...data);
+const makeFibonacciTable = () => {
+    for (let i = 2; i <= maxCase; i++) {
+        FIBONACCI_TABLE[i] = (FIBONACCI_TABLE[i - 1] + FIBONACCI_TABLE[i - 2]) % 100_000_000;
+    }
+};
 
-let fibo1 = 0;
-let fibo2 = 1;
-let sum = 0;
+const getFibo = () => {
+    return data.map(num => FIBONACCI_TABLE[num]).join("\n");
+};
 
-for(let i = 0 ; i < maxIndex ; i++){
-    sum = (fibo1 + fibo2) % 100000000;
-    fibotable[i] = sum;
-    fibo1 = fibo2;
-    fibo2 = sum;
-}
-
-fibotable.unshift(1);
-fibotable.unshift(0);
-
-for(let i = 0; i < n ; i++){
-    answer += fibotable[data[i]] +"\n";
-}
-
-console.log(answer);
+makeFibonacciTable();
+console.log(getFibo());
