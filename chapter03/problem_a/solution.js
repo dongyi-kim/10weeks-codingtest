@@ -5,28 +5,26 @@ const input = (()=>{
     return ()=>stdin[ln++];
 })();
 
-// data 입력 및 배열 정렬
 const n = Number(input());
-const data = []
-for(let i = 0 ; i < n ; i++){
-    data[i] = Number(input());
-}
-data.sort()
+const data = Array.from({length: n}, () => Number(input()));
+const table = Array.from({length: 10_000}, () => 0);
 
-// 전화번호 빈도수 table 선언, 초기화
-const table = Array(10000).fill(0)
-
-for(let i = 0 ; i < n ; i++){
-    table[data[i]] += 1;
+const fillFrequencyTable = () => {
+    data.forEach(number => table[number] += 1);
 }
 
-const max = Math.max(...table);
+const getFrequentNumber = () => {
+    let frequent_number = 0;
 
-let answer = String(table.findIndex((x)=> x === max))
+    for (let number = 0; number < table.length; number++) {
+        if (table[number] > table[frequent_number]) {
+            frequent_number = number;
+        }
+    }
 
-//자릿수 맞추기
-while(answer.length < 4){
-    answer = ["0"].concat(num.split("")).join("")
+    return frequent_number;
 }
 
-console.log(answer)
+fillFrequencyTable();
+// 자릿수 맞추어 출력하기
+console.log(String(getFrequentNumber()).padStart(4, '0'));
