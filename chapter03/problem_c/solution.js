@@ -9,7 +9,7 @@ const N = Number(input());
 const data = input().split(" ").map(Number);
 const serial = Array(100001).fill(0);
 
-for(let i = 0 ; i < data.length ; i++){
+for(let i = 0 ; i < N ; i++){
     serial[data[i]] += 1;
 }
 
