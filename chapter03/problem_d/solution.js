@@ -19,10 +19,8 @@ for (let i = 0; i < T; i++) {
 }
 
 const makeFibonacciTable = () => {
-    for (let i = 2; i <= maxCase; i++) {
-        FIBONACCI_TABLE[i] = (FIBONACCI_TABLE[i - 1] + FIBONACCI_TABLE[i - 2]) % 100_000_000;
-    }
-};
+    return Array.from({ length: maxCase }, (_, i) => (FIBONACCI_TABLE[i + 2] = (FIBONACCI_TABLE[i] + FIBONACCI_TABLE[i + 1]) % 100_000_000));
+}
 
 const getFibo = () => {
     return data.map(num => FIBONACCI_TABLE[num]).join("\n");
