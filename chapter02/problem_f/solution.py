@@ -33,7 +33,7 @@ def closest_pair(points: List[point2d]) -> Tuple[float, int]:
 	:param points:	점들의 리스트
 	:return:		가장 가까운 두 점 사이의 거리
 	"""
-	min_dist: float = -1  # 가장 가까운 쌍의 거리
+	min_dist = -1  # 가장 가까운 쌍의 거리
 	min_count: int = -1  # 가장 가까운 쌍의 수
 	n = len(points)
 
