@@ -1,118 +1,82 @@
-import java.io.*;
-import java.lang.*;
 import java.util.*;
+import java.lang.*;
 
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
-	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
 
-	public static int[] computeShortestPaths(Node[] nodes, Node origin) {
+	public static void main(String[] args) {
+		String stringA = scanner.next();
+		String stringB = scanner.next();
+		int n = stringA.length();
+		int m = stringB.length();
 
-		PriorityQueue<State> bfsQueue = new PriorityQueue<>();
-		State initialState = new State(origin, 0);
-		bfsQueue.add(initialState);
+		LCS lcs = new LCS(stringA, stringB);
+		int answer = lcs.f(n - 1, m - 1);
 
-
-		boolean[] visited = new boolean[nodes.length];
-		int[] distance = new int[nodes.length];
-		Arrays.fill(distance, Integer.MAX_VALUE);
-
-		while(bfsQueue.isEmpty() == false){
-			State current = bfsQueue.poll();
-			Node currentNode = current.currentNode;
-
-			if( visited[currentNode.index] == true ){
-				continue;
-			}
-
-			visited[currentNode.index] = true;
-			distance[currentNode.index] = current.totalWeight;
-
-			for(Edge e : currentNode.edges){
-				Node nextNode = e.dest;
-				if(visited[nextNode.index] == true){
-					continue;
-				}
-
-				int nextTotalWeight = current.totalWeight + e.weight;
-
-				State nextState = new State(nextNode, nextTotalWeight);
-
-				bfsQueue.add( nextState );
-			}
-		}
-
-		return distance;
-	}
-
-	public static void main(String[] args) throws Exception {
-		int V = scanner.nextInt();
-		int E = scanner.nextInt();
-		int origin = scanner.nextInt();
-
-		Node[] nodes = new Node[V+1];
-		for(int i = 1; i <= V; i+= 1){
-			nodes[i] = new Node(i);
-		}
-
-		for(int i = 0 ; i < E; i += 1){
-			int u = scanner.nextInt();
-			int v = scanner.nextInt();
-			int w = scanner.nextInt();
-			Edge e = new Edge(nodes[u], nodes[v], w);
-			nodes[u].edges.add(e);
-		}
-
-		int[] distances = computeShortestPaths(nodes, nodes[origin]);
-
-		for(int i = 1; i <= V; i+= 1){
-			if(distances[i] == Integer.MAX_VALUE){
-				writer.write("INF\n");
-			}else{
-				writer.write(String.format("%d\n", distances[i]));
-			}
-		}
-		writer.flush();
-		writer.close();
-	}
-
-}
-
-
-class Node{
-	public final int index;
-	public final ArrayList<Edge> edges;
-
-	public Node(int index){
-		this.index = index;
-		this.edges = new ArrayList<Edge>();
+		System.out.println(answer);
 	}
 }
 
-class Edge{
-	public final Node origin;
-	public final Node dest;
-	public final int weight;
 
-	public Edge(Node origin, Node dest, int weight){
-		this.origin = origin;
-		this.dest = dest;
-		this.weight = weight;
+class LCS {
+	private static final int EMPTY = -1;
+	private int[][] memo;
+
+	private char[] A;
+	private char[] B;
+
+	private int lenA;
+	private int lenB;
+
+	public LCS(String stringA, String stringB) {
+		A = stringA.toCharArray();
+		B = stringB.toCharArray();
+		lenA = A.length;
+		lenB = B.length;
+		this.memo = new int[lenA][lenB];
+		for (int i = 0; i < lenA; i += 1) {
+			for (int j = 0; j < lenB; j += 1) {
+				memo[i][j] = EMPTY;
+			}
+		}
 	}
-}
 
-class State implements Comparable<State>{
-	public final Node currentNode;
-	public final int totalWeight;
+	/**
+	 * 부분 문자열 A[0..lastIndexA]와 B[0..lastIndexB] 사이의 LCS길이
+	 *
+	 * @param lastIndexA 문자열 A의 마지막 문자 인덱스
+	 * @param lastIndexB 문자열 B의 마지막 문자 인덱스
+	 * @return 해당 부분 문자 열사이의 LCS길이
+	 */
+	public int f(int lastIndexA, int lastIndexB) {
+		if (lastIndexA < 0 || lastIndexB < 0) {
+			// 둘 중 하나가 빈 문자열인 경우는 0
+			return 0;
+		} else if (memo[lastIndexA][lastIndexB] != EMPTY) {
+			// 이미 계산된 값인 경우
+			return memo[lastIndexA][lastIndexB];
+		}
 
-	public State(Node currentNode, int totalWeight){
-		this.currentNode = currentNode;
-		this.totalWeight = totalWeight;
+		int caseA = f(lastIndexA - 1, lastIndexB);	// A[i]를 제외하고 계산한 LCS
+		int caseB = f(lastIndexA, lastIndexB - 1);	// B[j]를 제외하고 계산한 LCS
+		int caseC = f(lastIndexA - 1, lastIndexB - 1);	// A[i], B[j]를 모두 제외하고 계산한 LCS
+		if (A[lastIndexA] == B[lastIndexB]) {
+			caseC += 1;		// 만약 A[i], B[j]가 일치한다면 LCS길이 + 1
+		}
+
+		int answer = MAX(caseA, caseB, caseC);
+
+		memo[lastIndexA][lastIndexB] = answer;
+		return answer;
 	}
 
-	@Override
-	public int compareTo(State other) {
-		return this.totalWeight - other.totalWeight;
+
+	public static int MAX(int... arr) {
+		int max = arr[0];
+		for (int i = 0; i < arr.length; i += 1) {
+			max = Math.max(max, arr[i]);
+		}
+		return max;
 	}
 }

@@ -1,93 +1,72 @@
 import java.io.*;
-import java.lang.*;
 import java.util.*;
+import java.lang.*;
 
 
 public class Main {
-	public static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+	public static final Scanner scanner = new Scanner(System.in);
 
-	public static String[] readLine() throws Exception {
-		return reader.readLine().split(" ");
-	}
-
-	public static void main(String[] args) throws Exception {
-		String[] NM = readLine();
-		int N = Integer.parseInt(NM[0]);
-		int M = Integer.parseInt(NM[1]);
-
-		DisjointSet disjointSet = new DisjointSet(N);
-
-		for (int i = 0; i < M; i += 1) {
-			String[] command = readLine();
-
-			int u = Integer.parseInt(command[1]);
-			int v = Integer.parseInt(command[2]);
-
-			if (command[0].equals("LINK")) {
-				disjointSet.union(u, v);
-				int groupSize = disjointSet.getNumberOfConnectedNodes(u);
-				writer.write(String.format("SIZE = %d\n", groupSize));
-			} else if (command.equals("CHECK")) {
-				if (disjointSet.isConnected(u, v) == true) {
-					writer.write("Connected\n");
-				} else {
-					writer.write("Separated\n");
-				}
+	public static void main(String[] args) {
+		int n = scanner.nextInt();
+		int[][] costMap = new int[n][n];
+		for (int r = 0; r < n; r += 1) {
+			for (int c = 0; c < n; c += 1) {
+				costMap[r][c] = scanner.nextInt();
 			}
-
 		}
 
-		reader.close();
-		writer.flush();
-		writer.close();
-	}
+		Solution solution = new Solution(costMap);
+		int answer = solution.f(n-1,n-1);
 
+		System.out.println(answer);
+	}
 }
 
-class DisjointSet {
-	private final int size;
-	private int[] groupBoss;
-	private int[] groupSize;
 
-	public DisjointSet(int size) {
-		this.size = size;
-		this.groupBoss = new int[size + 1];
-		this.groupSize = new int[size + 1];
-		for (int nodeIndex = 1; nodeIndex <= size; nodeIndex += 1) {
-			groupSize[nodeIndex] = 1;
-			groupBoss[nodeIndex] = nodeIndex;
+class Solution {
+	private static final int EMPTY = -1;
+	private static final int INFINITY = 1000000000;
+
+	private int[][] cost;
+	private int[][] memo;
+	private int n;
+
+	public Solution(int[][] costMap) {
+		int n = costMap.length;
+		this.cost = new int[n][n];
+		this.memo = new int[n][n];
+		for (int i = 0; i < n; i += 1) {
+			for (int j = 0; j < n; j += 1) {
+				this.cost[i][j] = costMap[i][j];
+				this.memo[i][j] = EMPTY;
+			}
 		}
 	}
 
-	public int getGroupBoss(int u) {
-		if (groupBoss[u] == u) {
-			return u;
-		} else {
-			groupBoss[u] = getGroupBoss(groupBoss[u]);
-			return groupBoss[u];
+
+	/**
+	 * (0, 0) ~ (lastRow, lastCol)까지만 고려했을 때 문제의 정답
+	 *
+	 * @param lastRow
+	 * @param lastCol
+	 * @return	최단경로들 중 가장 작은 난이도 합
+	 */
+	public int f(int lastRow, int lastCol) {
+		if (lastCol < 0 || lastRow < 0) {
+			return INFINITY;
+		} else if (memo[lastRow][lastCol] != EMPTY) {
+			return memo[lastRow][lastCol];
+		} else if (lastRow == 0 && lastCol == 0) {
+			return cost[0][0];
 		}
+
+		int answer = Math.min(
+				f(lastRow - 1, lastCol) + cost[lastRow][lastCol],
+				f(lastRow, lastCol - 1) + cost[lastRow][lastCol]
+		);
+
+		memo[lastRow][lastCol] = answer;
+		return answer;
 	}
 
-	public void union(int u, int v) {
-		if(isConnected(u, v)){
-			return;
-		}
-
-		int uBoss = getGroupBoss(u);
-		int vBoss = getGroupBoss(v);
-		groupSize[uBoss] += groupSize[vBoss];
-		groupBoss[vBoss] = uBoss;
-	}
-
-	public boolean isConnected(int u, int v) {
-		int uBoss = getGroupBoss(u);
-		int vBoss = getGroupBoss(v);
-		return uBoss == vBoss;
-	}
-
-	public int getNumberOfConnectedNodes(int u) {
-		int uBoss = getGroupBoss(u);
-		return this.groupSize[uBoss];
-	}
 }

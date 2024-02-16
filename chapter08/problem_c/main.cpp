@@ -1,60 +1,122 @@
 #include <cstdio>
 #include <vector>
-#include <algorithm>
+#include <queue>
 
 using namespace std;
 
+class Graph {
+public:
+	int V;
+	vector<vector<bool> > adj;
+	vector<int> degree;
 
-int getLongestPathLength(int current, int goal, int depth, const vector<vector<int> >& adj, vector<bool>& visited) {
-	if(visited[current] == true || current == goal) {
-		return 0;
+	Graph(int V) {
+		this->adj = vector<vector<bool> >(V + 1, vector<bool>(V + 1, false));
+		this->V = V;
+		this->degree = vector<int>(V + 1, 0);
 	}
 
-	int maxLength = 0;
-
-	visited[current] = true;
-	for (int i = 0; i < adj[current].size(); i += 1) {
-		int nextNode = adj[current][i];
-
-		int length = 1 + getLongestPathLength(nextNode, goal, depth + 1, adj, visited);
-		maxLength = max(maxLength , length);
+	void addEdge(int u, int v) {
+		adj[u][v] = adj[v][u] = true;
+		degree[u] += 1;
+		degree[v] += 1;
 	}
-	visited[current] = false;
 
-	return maxLength;
+	bool hasEdge(int u, int v) const {
+		return adj[u][v];
+	}
+
+	int getDegree(int nodeIndex) const {
+		return this->degree[nodeIndex];
+	}
+
+};
+
+bool isConnectedGraph(const Graph& graph) {
+	queue<int> reachableNodes;
+	vector<bool> visited(graph.V + 1);
+
+	int originNode = 1;
+	int visitCount = 0;
+	reachableNodes.push(originNode);
+	while (reachableNodes.empty() == false) {
+		int currentNode = reachableNodes.front();
+		reachableNodes.pop();
+
+		if (visited[currentNode] == true) {
+			continue;
+		}
+
+		visited[currentNode] = true;
+		visitCount += 1;
+
+		for (int nextNode = 1; nextNode <= graph.V; nextNode += 1) {
+			if (graph.hasEdge(currentNode, nextNode)) {
+				reachableNodes.push(nextNode);
+			}
+		}
+	}
+
+	return visitCount == graph.V;
 }
 
-/**
- * 두 노드 current부터 goal까지의 최장 경로의 길이를 반환하는 함수
- *
- * @param current
- * @param goal
- * @param adj
- * @return
- */
-int getLongestPathLength(int current, int goal, const vector<vector<int> >& adj) {
-	int N = adj.size();
+bool hasEulerPath(const Graph& graph) {
+	if (isConnectedGraph(graph) == false) {
+		return false;
+	}
 
-	vector<bool> visited(N + 1, false);
+	int oddDegree = 0;
+	for (int node = 1; node <= graph.V; node += 1) {
+		int degree = graph.getDegree(node);
+		if (degree % 2 == 1) {
+			oddDegree += 1;
+		}
+	}
 
-	return getLongestPathLength(current, goal, 1, adj, visited);
+	return oddDegree == 0 || oddDegree == 2;
+}
+
+bool hasEulerCircuit(const Graph& graph) {
+	if (isConnectedGraph(graph) == false) {
+		return false;
+	}
+
+	int oddDegree = 0;
+	for (int node = 1; node <= graph.V; node += 1) {
+		int degree = graph.getDegree(node);
+		if (degree % 2 == 1) {
+			oddDegree += 1;
+			break;
+		}
+	}
+
+	return oddDegree == 0;
 }
 
 int main() {
-	int N, M;
-	scanf("%d%d", &N, &M);
-	vector<vector<int> > adj(N + 1);
+	int V;
+	scanf("%d", &V);
 
-	int origin, dest;
-	scanf("%d%d", &origin, &dest);
-
-	for(int i = 0 ; i < M; i += 1){
-		int u, v;
-		scanf("%d%d", &u, &v);
-		adj[u].push_back(v);
-		adj[v].push_back(u);
+	Graph graph(V);
+	for (int u = 1; u <= V; u += 1) {
+		for (int v = 1; v <= V; v += 1) {
+			int exist;
+			scanf("%d", &exist);
+			if (exist == 1) {
+				graph.addEdge(u, v);
+			}
+		}
 	}
 
-	int answer = getLongestPathLength(origin, dest, adj);
-	printf("%d\n", answer);
+	if (hasEulerPath(graph)) {
+		puts("YES");
+	} else {
+		puts("NO");
+	}
+
+	if (hasEulerCircuit(graph)) {
+		puts("YES");
+	} else {
+		puts("NO");
+	}
 }

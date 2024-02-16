@@ -1,124 +1,128 @@
-import java.io.*;
-import java.lang.*;
 import java.util.*;
+import java.lang.*;
 
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 
-	public static boolean isConnectedGraph(Graph graph) {
-		Queue<Integer> reachableNodes = new LinkedList();
-
-		boolean[] visited = new boolean[graph.V + 1];
-
-		int originNode = 1;
-		int visitCount = 0;
-		reachableNodes.add(originNode);
-		while (reachableNodes.isEmpty() == false) {
-			int currentNode = reachableNodes.poll();
-
-			if (visited[currentNode] == true) {
-				continue;
-			}
-
-			visited[currentNode] = true;
-			visitCount += 1;
-
-			for (int nextNode = 1; nextNode <= graph.V; nextNode += 1) {
-				if (graph.hasEdge(currentNode, nextNode)) {
-					reachableNodes.add(nextNode);
-				}
-			}
+	public static int MAX(int... arr) {
+		int max = arr[0];
+		for (int i = 0; i < arr.length; i += 1) {
+			max = Math.max(max, arr[i]);
 		}
-
-		return visitCount == graph.V;
+		return max;
 	}
 
-	public static boolean hasEulerPath(Graph graph) {
-		if (false == isConnectedGraph(graph)) {
-			return false;
+	public static void main(String[] args) {
+		int n = scanner.nextInt();
+		int[] profits = new int[n];
+		for (int i = 0; i < n; i += 1) {
+			profits[i] = scanner.nextInt();
 		}
 
-		int oddDegree = 0;
-		for (int node = 1; node <= graph.V; node += 1) {
-			int degree = graph.getDegree(node);
-			if (degree % 2 == 1) {
-				oddDegree += 1;
-			}
+		int answer;
+
+		// 두 가지 방법을 완성해보세요
+
+		//[Solution A]
+		SolutionA solutionA = new SolutionA(profits);
+		answer = MAX(
+				solutionA.f(n - 1, 0),
+				solutionA.f(n - 1, 1),
+				solutionA.f(n - 1, 2)
+		);
+
+		//[Solution B]
+		SolutionB solutionB = new SolutionB(profits);
+		answer = 0;
+		for (int i = 0; i < n; i += 1) {
+			answer = Math.max(answer, solutionB.f(i));
 		}
 
-		return oddDegree == 0 || oddDegree == 2;
+		System.out.println(answer);
+	}
+}
+
+class SolutionA {
+	private static int EMPTY = -1;
+	private int[][] memo;
+	private int[] profits;
+	private int n;
+
+	public SolutionA(int[] profits) {
+		this.n = profits.length;
+		this.profits = profits.clone();
+		this.memo = new int[n][3];
+		for (int i = 0; i < n; i += 1) {
+			Arrays.fill(memo[i], EMPTY);
+		}
 	}
 
-	public static boolean hasEulerCircuit(Graph graph) {
-		if (false == isConnectedGraph(graph)) {
-			return false;
+	/**
+	 * lastIndex번째 날에 연속으로 count번째 근무한다면 얻을 수 있는 최대 인센티브
+	 *
+	 * @param lastIndex 고려할 마지막 날짜의 인덱스
+	 * @param count     연속으로 근무한 횟수
+	 * @return 해당 가정에서의 정답
+	 */
+	public int f(int lastIndex, int count) {
+		if (lastIndex < 0 || count < 0 || count >= 3) {
+			return 0;
+		} else if (memo[lastIndex][count] != EMPTY) {
+			return memo[lastIndex][count];
 		}
 
-		int oddDegree = 0;
-		for (int node = 1; node <= graph.V; node += 1) {
-			int degree = graph.getDegree(node);
-			if (degree % 2 == 1) {
-				oddDegree += 1;
-				break;
-			}
-		}
-
-		return oddDegree == 0;
-	}
-
-	public static void main(String[] args) throws Exception {
-		int V = scanner.nextInt();
-
-		Graph graph = new Graph(V);
-		for (int u = 1; u <= V; u += 1) {
-			for (int v = 1; v <= V; v += 1) {
-				int exist = scanner.nextInt();
-				if (exist == 1) {
-					graph.addEdge(u, v);
-				}
-			}
-		}
-
-		if (hasEulerPath(graph)) {
-			System.out.println("YES");
+		int answer = 0;
+		if (count == 0) {
+			int caseA = f(lastIndex - 1, 0);
+			int caseB = f(lastIndex - 1, 1);
+			int caseC = f(lastIndex - 1, 2);
+			answer = Main.MAX(caseA, caseB, caseC);
 		} else {
-			System.out.println("NO");
+			answer = f(lastIndex - 1, count - 1) + profits[lastIndex];
 		}
 
-		if (hasEulerCircuit(graph)) {
-			System.out.println("YES");
-		} else {
-			System.out.println("NO");
-		}
+		memo[lastIndex][count] = answer;
+		return memo[lastIndex][count];
 	}
 
 }
 
-class Graph {
-	public final int V;
-	private boolean[][] adj;
-	private int[] degree;
+class SolutionB {
+	private static int EMPTY = -1;
+	private int[] memo;
+	private int[] profits;
+	private int n;
 
-	public Graph(int V) {
-		this.adj = new boolean[V + 1][V + 1];
-		this.V = V;
-		this.degree = new int[V + 1];
+	public SolutionB(int[] profits) {
+		this.n = profits.length;
+		this.profits = profits.clone();
+		this.memo = new int[n];
+		Arrays.fill(memo, EMPTY);
 	}
 
-	public void addEdge(int u, int v) {
-		adj[u][v] = adj[v][u] = true;
+	/**
+	 * profits[0] ~ profits[lastIndex]까지만 고려했을 때의 정답
+	 * 단, profits[lastIndex]는 무조건 마지막으로 사용한다.
+	 *
+	 * @param lastIndex 마지막으로 근무할 날의 인덱스
+	 * @return 'lastIndex'번째 날에 마지막으로 근무 했을 때 얻을 수 있는 최대 인센티브
+	 */
+	public int f(int lastIndex) {
+		if (lastIndex < 0) {
+			return 0;
+		} else if (memo[lastIndex] != EMPTY) {
+			return memo[lastIndex];
+		} else if (lastIndex == 0) {
+			return profits[0];
+		}
 
-		degree[u] += 1;
-		degree[v] += 1;
+		int answer = Math.min(
+			f(lastIndex - 2) + profits[lastIndex],
+			f(lastIndex - 3) + profits[lastIndex - 1] + profits[lastIndex]
+		);
+
+		memo[lastIndex] = answer;
+		return memo[lastIndex];
 	}
-
-	public boolean hasEdge(int u, int v) {
-		return adj[u][v];
-	}
-
-	public int getDegree(int nodeIndex) {
-		return this.degree[nodeIndex];
-	}
-
 }

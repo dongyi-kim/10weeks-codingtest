@@ -2,127 +2,77 @@ import java.io.*;
 import java.util.*;
 import java.lang.*;
 
-
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 
-	public static void testCase(int caseIndex) {
-		int N = scanner.nextInt();
-		int R = scanner.nextInt();
-		int L = scanner.nextInt();
-
-		Robot[] robots = new Robot[N];
-		for (int i = 0; i < N; i += 1) {
-			int X = scanner.nextInt();
-			robots[i] = new Robot(X, R);
-		}
-
-		int answer = Solution.getMinimumMoveDistance(N, L, robots);
-
-		System.out.println(answer == Integer.MAX_VALUE ? -1 : answer);
-	}
-
 	public static void main(String[] args) {
-		int caseNum = scanner.nextInt();
-		for (int caseIndex = 1; caseIndex <= caseNum; caseIndex += 1) {
-			testCase(caseIndex);
+		String S = scanner.next();
+		String P = scanner.next();
+
+		int N = S.length();
+		int M = P.length();
+
+		int[] PI = new int[M];
+
+		for (int i = 0; i < M; i += 1) {
+			PI[i] = scanner.nextInt();
 		}
-	}
-}
 
-class Solution {
+		ArrayList<Integer> indexes
+				= KMP.getMatchedIndexes(S, P, PI);
 
-	/**
-	 * 로봇의 최대 이동 가능 거리가 D일 때, 전체 영역을 감시할 수 있는지 여부를 계산
-	 *
-	 * @param N		로봇의 수
-	 * @param L		감시 영역의 길이
-	 * @param D		최대 이동 가능 거리
-	 * @param robots
-	 */
-	public static boolean isPossible(int N, int L, int D, Robot[] robots) {
-		int leftEnd = 0;	// 감시 가능한 왼쪽 끝 좌표
-		int rightEnd = L;	// 감시 대상의 오른쪽 끝 좌표
-
-		for (int i = 0; i < N; i += 1) {	// 각 로봇을 왼쪽부터 조회하면서
-
-			if (leftEnd <= robots[i].leftBound) {
-				// 현재까지 감시 가능한 영역(leftEnd)와 robots[i]의 사이에 공백이 존재하는 경우
-				// 로봇을 왼쪽으로 이동시켜 공백을 매꾼다
-
-				int distance = robots[i].leftBound - leftEnd; // 이동시켜야 할 거리
-				if (distance > D) {	// 이동거리 상한보다 더 이동시켜야만 하는 경우
-					// 불가능으로 처리한다. 해당 빈 공간을 감시할 수 없다.
-					return false;
+		if (indexes.size() == 0) {
+			System.out.println("Not Matched");
+		} else {
+			StringBuilder output = new StringBuilder();
+			for (int i = 0; i < indexes.size(); i += 1) {
+				if (i > 0) {
+					output.append(" ");
 				}
-
-				// 그렇지 않으면 왼쪽으로 이동시킨다. 이 때, 접할정도까지만 이동시킨다.
-				leftEnd = Math.max(robots[i].rightBound - distance, leftEnd);
-			} else {
-				// 로봇이 이미 감시 완료된 영역을 포함하고 있을 때
-
-				// 공백이 생기지 않는 선에서 로봇을 오른쪽으로 최대 D만큼 이동시킨다.
-				int distance = Math.min(D, leftEnd - robots[i].leftBound);
-
-				// 이동시킨 후 새로 감시완료된 영역을 반영한다.
-				leftEnd = Math.max(robots[i].rightBound + distance, leftEnd);
+				output.append(indexes.get(i));
 			}
-
-			// [0, rightEnd]까지 모두 감시가 완료된 경우 true, 아니면 false
-			if(leftEnd >= rightEnd){
-				break;
-			}
+			System.out.println(output.toString());
 		}
-		// [0, rightEnd]까지 모두 감시가 완료된 경우 true, 아니면 false
-		return leftEnd >= rightEnd;
-	}
-
-	/**
-	 * 전체 영역을 감시하기 위해 필요한 최소의 이동거리 상한을 계산하는 함수
-	 *
-	 * @param N
-	 * @param L
-	 * @param robots
-	 * @return
-	 */
-	public static int getMinimumMoveDistance(int N, int L, Robot[] robots) {
-		Arrays.sort(robots);
-		long lowerBound = 0;					// 전혀 이동이 필요 없는 경우
-		long upperBound = Integer.MAX_VALUE;	// 이론상 최대 이동 가능 거리
-
-		while (lowerBound < upperBound) {
-			// 이동 거리 상한을 설정한다
-			int distanceLimit = (int) ((lowerBound + upperBound) / 2);
-
-			// 이후 가능 여부를 검사한다
-			boolean possible = isPossible(N, L, distanceLimit, robots);
-
-			if (possible == true) {
-				// 가능하다면 그 이하의 상한에 대해 조사한다
-				upperBound = distanceLimit;
-			} else {
-				// 불가능하다면 더 큰 상한에 대해서 조사한다
-				lowerBound = distanceLimit + 1;
-			}
-		}
-
-		return (int)lowerBound;
 	}
 }
 
-class Robot implements Comparable<Robot> {
-	public final int x;				// 로봇의 초기 위치
-	public final int leftBound;		// 로봇의 초기 왼쪽 감시영역 끝 좌표
-	public final int rightBound;	// 로봇의 초기 오른쪽 감시영역 끝 좌표
+class KMP {
+	/**
+	 * KMP 알고리즘을 수행하여 패턴이 매칭된 시작 인덱스들을 반환하는 함수
+	 *
+	 * @param S     탐색 문자열
+	 * @param P     패턴 문자열
+	 * @param PI    패턴 P에 대한 Prefix-Function(Failure Function)
+	 * @return      모든 시작 인덱스 리스트 (오름차순)
+	 */
+	public static ArrayList<Integer> getMatchedIndexes(String S, String P, int[] PI) {
+		final int N = S.length();    //대상 문자열의 길이
+		final int M = P.length();    //패턴 문자열의 길이
 
-	public Robot(int x, int r) {
-		this.x = x;
-		this.leftBound = x - r;
-		this.rightBound = x + r;
-	}
+		int begin = 0;                // 비교를 시작할 왼쪽 인덱스
+		int matched = 0;            // 일치한 문자 수
 
-	@Override
-	public int compareTo(Robot other) {
-		return this.x - other.x;
+		ArrayList<Integer> matchedIndexes = new ArrayList<>();
+
+    while (begin + matched < N) {	// 대상 문자열을 초과하지 않는 동안
+			// 현재 위치 문자가 패턴과 일치하는 경우
+			if (matched < M && S.charAt(begin + matched) == P.charAt(matched)) {
+				matched += 1;
+				if (matched == M) { // M개의 글자가 일치한다 <=> 이 위치에서 패턴이 등장한다
+					matchedIndexes.add(begin);
+				}
+			} else {
+				if (matched == 0) {
+					// 한 글자도 일치하지 않았다면 그냥 다음 칸으로 이동한다
+					begin += 1;
+				} else {
+					// 일부분이 일치한 후 글자가 틀린 경우
+					begin += matched - PI[matched - 1];	// 다음 후보 위치로 이동한다
+					matched = PI[matched - 1];			// 해당 부분에서 접두사의 길이만큼은 비교를 생략한다.
+				}
+			}
+		}
+
+		return matchedIndexes;
 	}
 }

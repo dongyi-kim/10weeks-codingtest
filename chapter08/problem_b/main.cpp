@@ -1,122 +1,100 @@
 #include <cstdio>
 #include <vector>
-#include <stack>
-#include <queue>
-#include <algorithm>
 
 using namespace std;
 
-class State{
+const int INF = 987654321;
+
+class Graph{
 public:
-	int nodeIndex;
-	int depth;
-	State(int nodeIndex, int depth){
-		this->nodeIndex = nodeIndex;
-		this->depth = depth;
+	vector<vector<int> > adj;
+	int V;
+	Graph(int V) {
+		this->adj = vector<vector<int> >(V + 1, vector<int>(V + 1, 0));
+		this->V = V;
+	}
+
+	void addEdge(int from, int to, int weight) {
+		adj[from][to] = weight;
+	}
+
+	bool hasEdge(int from, int to) const {
+		return adj[from][to] != 0;
+	}
+
+	int getDistance(int from, int to) const {
+		if(hasEdge(from, to)) {
+			return adj[from][to];
+		} else {
+			return INF;
+		}
 	}
 };
 
-/**
- * @param N     그래프의 정점의 수
- * @param adj   각 노드들에 대한 인접 리스트의 배열
- * @return      깊이 우선 탐색으로 탐색된 노드들의 번호 리스트
- */
-vector<int> getDfsOrder(int N, const vector<vector<int> >& adj) {
-	vector<int> visitedNodes;
+int getShortestHamiltonCircuit(int currentNode, int depth, int totalLength, vector<int>& path, vector<bool>& used, const Graph& graph) {
+	int origin = path[0];
 
-	stack<State> dfsStack;
-	State initialState(1, 1);
-	dfsStack.push(initialState);
+	if(depth == graph.V) {
+		if(graph.hasEdge(currentNode, origin)) {
+			int pathLength = totalLength + graph.getDistance(currentNode, origin);
+			return pathLength;
+		} else {
+			return INF;
+		}
+	}
 
-	vector<bool> visited(N + 1);
-	while(dfsStack.empty() == false) {
-		State current = dfsStack.top();
-		dfsStack.pop();
-
-		if(visited[current.nodeIndex] == true) {
+	int minLength = INF;
+	for(int nextNode = 1; nextNode <= graph.V; nextNode += 1) {
+		if(graph.hasEdge(currentNode, nextNode) == false || used[nextNode]) {
 			continue;
 		}
 
-		visited[current.nodeIndex] = true;
-		visitedNodes.push_back(current.nodeIndex);
-
-		for(int ni = adj[current.nodeIndex].size() - 1 ; ni >= 0 ; ni -= 1) {
-			int next = adj[current.nodeIndex][ni];
-			if(visited[next] == false) {
-				State nextState(next, current.depth + 1);
-				dfsStack.push(nextState);
-			}
-		}
-	}
-
-	return visitedNodes;
-}
-
-/**
- * @param N     그래프의 정점의 수
- * @param adj   각 노드들에 대한 인접 리스트의 배열
- * @return      너비 우선 탐색으로 탐색된 노드들의 번호 리스트
- */
-vector<int> getBfsOrder(int N, const vector<vector<int> >& adj) {
-	vector<int> visitedNodes;
-
-	queue<State> bfsQueue;
-	State initialState(1, 1);
-	bfsQueue.push(initialState);
-
-	vector<bool> visited(N + 1);
-	while(bfsQueue.empty() == false){
-		State current = bfsQueue.front();
-		bfsQueue.pop();
-
-		if(visited[current.nodeIndex] == true) {
+		int nextLength = totalLength + graph.getDistance(currentNode, nextNode);
+		if(nextLength >= minLength){
 			continue;
 		}
 
-		visited[current.nodeIndex] = true;
-		visitedNodes.push_back(current.nodeIndex);
+		path.push_back(nextNode);
+		used[nextNode] = true;
 
-		for(int ni = 0 ; ni < adj[current.nodeIndex].size() ; ni += 1) {
-			int next = adj[current.nodeIndex][ni];
-			if(visited[next] == false) {
-				State nextState(next, current.depth + 1);
-				bfsQueue.push(nextState);
-			}
-		}
+		int length = getShortestHamiltonCircuit(nextNode, depth+1, nextLength, path, used, graph);
+		minLength = min(length, minLength);
+
+		path.pop_back();
+		used[nextNode] = false;
 	}
 
-	return visitedNodes;
+	return minLength;
 }
 
-void printArrayList(const vector<int>& vi){
-	for(int i = 0 ; i < vi.size(); i+= 1){
-		if(i > 0) {
-			printf("-");
-		}
-		printf("%d", vi[i]);
-	}
-	printf("\n");
+int getShortestHamiltonCircuit(const Graph& graph) {
+	int origin = 1;
+	vector<int> path;
+	vector<bool> used(graph.V);
+	path.push_back(origin);
+	used[origin] = true;
+	int answer = getShortestHamiltonCircuit(origin, 1, 0, path, used, graph);
+	return answer;
 }
 
 int main() {
-	int N, M;
-	scanf("%d%d", &N, &M);
-	vector<vector<int> > adj(N + 1);
+	int V;
+	scanf("%d", &V);
 
-	for(int i = 0 ; i < M; i += 1){
-		int u, v;
-		scanf("%d%d", &u, &v);
-		adj[u].push_back(v);
-		adj[v].push_back(u);
+	Graph graph(V);
+	for(int from = 1; from <= V; from += 1) {
+		for(int to = 1; to <= V ; to += 1) {
+			int weight;
+			scanf("%d", &weight);
+			graph.addEdge(from, to, weight);
+		}
 	}
 
-	for (int i = 1; i <= N; i += 1) {
-		sort(adj[i].begin(), adj[i].end());
+	int answer = getShortestHamiltonCircuit(graph);
+
+	if(answer == INF) {
+		puts("NO PATH");
+	} else {
+		printf("%d\n", answer);
 	}
-
-	vector<int> dfsOrders = getDfsOrder(N, adj);
-	vector<int> bfsOrders = getBfsOrder(N, adj);
-
-	printArrayList(dfsOrders);
-	printArrayList(bfsOrders);
 }

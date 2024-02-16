@@ -4,57 +4,98 @@ import java.util.*;
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
-	public static final int MAXIMUM_VIRUS = 10000;
 
-	public static void testCase(int caseIndex) {
-		int targetNumber = scanner.nextInt();
+	public static Edge[] getMinimumSpanningTree(int V, int E, Edge[] edges){
+		// 트리는 항상 V-1개의 간선이 있다.
+		Edge[] spanningTree = new Edge[V-1];
 
-		int[] distance = new int[MAXIMUM_VIRUS + 1];
-		boolean[] visited = new boolean[MAXIMUM_VIRUS + 1];
+		// 빈 그래프 G에 대한 disjointSet을 선언한다
+		DisjointSet disjointSet = new DisjointSet(V);
 
-		State initialState = new State(1, 1);
-		Queue<State> queue = new LinkedList<>();
-		queue.add(initialState);
+		// 간선들을 오름차순으로 정렬한다
+		Arrays.sort(edges);
 
-		while (queue.isEmpty() == false) {
-			State current = queue.poll();
-
-			if(current.numberOfVirus > MAXIMUM_VIRUS){
+		int mstIndex = 0;
+		for(Edge e : edges){
+			// 모든 간선 e에 대해
+			if(disjointSet.find(e.nodeU) == disjointSet.find(e.nodeV)){
+				// 이미 해당 두 정점이 연결성이 존재한다면 이 간선은 무시한다.
 				continue;
-			}else if (visited[current.numberOfVirus] == true) {
-				continue;
+			}else{
+				// 그렇지 않다면 이 간선을 그래프 G에 추가한다.
+				spanningTree[mstIndex ++] = e;
+				disjointSet.union(e.nodeU, e.nodeV);
 			}
-
-			visited[current.numberOfVirus] = true;
-			distance[current.numberOfVirus] = current.depth - 1;
-
-			State nextIncrease = new State(current.numberOfVirus * 2, current.depth + 1);
-			State nextDecrease = new State(current.numberOfVirus / 3, current.depth + 1);
-
-			queue.add(nextIncrease);
-			queue.add(nextDecrease);
 		}
 
-		int answer = distance[targetNumber];
-		System.out.println(answer);
+		return spanningTree;
 	}
 
 	public static void main(String[] args) throws Exception {
-		int caseSize = scanner.nextInt();
+		int V = scanner.nextInt();
+		int E = scanner.nextInt();
 
-		for (int caseIndex = 1; caseIndex <= caseSize; caseIndex += 1) {
-			testCase(caseIndex);
+		Edge[] edges = new Edge[E];
+		for(int i = 0 ; i < E; i += 1){
+			int u = scanner.nextInt();
+			int v = scanner.nextInt();
+			int w = scanner.nextInt();
+			edges[i] = new Edge(u, v, w);
 		}
+
+		Edge[] spanningTree = getMinimumSpanningTree(V, E, edges);
+
+		long weightSum = 0;
+		for(Edge e : spanningTree){
+			weightSum += e.weight;
+		}
+
+		System.out.println(weightSum);
 	}
 
 }
 
-class State {
-	public final int numberOfVirus;
-	public final int depth;
+class Edge implements Comparable<Edge>{
+	public final int nodeU;
+	public final int nodeV;
+	public final int weight;
 
-	public State(int numberOfVirus, int depth) {
-		this.numberOfVirus = numberOfVirus;
-		this.depth = depth;
+	public Edge(int nodeU, int nodeV, int weight){
+		this.nodeU = nodeU;
+		this.nodeV = nodeV;
+		this.weight = weight;
+	}
+
+	@Override
+	public int compareTo(Edge other) {
+		return this.weight - other.weight;
+	}
+}
+
+class DisjointSet {
+	private final int size;
+	private int[] groupBoss;
+
+	public DisjointSet(int size) {
+		this.size = size;
+		this.groupBoss = new int[size + 1];
+		for (int nodeIndex = 1; nodeIndex <= size; nodeIndex += 1) {
+			groupBoss[nodeIndex] = nodeIndex;
+		}
+	}
+
+	public int find(int u) {
+		if (groupBoss[u] == u) {
+			return u;
+		} else {
+			groupBoss[u] = find(groupBoss[u]);
+			return groupBoss[u];
+		}
+	}
+
+	public void union(int u, int v) {
+		int uBoss = find(u);
+		int vBoss = find(v);
+		groupBoss[vBoss] = uBoss;
 	}
 }

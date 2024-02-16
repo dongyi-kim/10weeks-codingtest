@@ -1,85 +1,93 @@
+import java.io.*;
 import java.lang.*;
 import java.util.*;
 
 
 public class Main {
-	public static final Scanner scanner = new Scanner(System.in);
+	public static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
 
-	/**
-	 * 그래프의 두 노드 org에서 dest로 이동하는 가장 짧은 경로의 길이를 반환하는 함수
-	 *
-	 * @param org
-	 * @param dest
-	 * @param adj
-	 * @return
-	 */
-	public static int getShortestPathLength(int org, int dest, ArrayList<Integer>[] adj) {
-		int N = adj.length;
+	public static String[] readLine() throws Exception {
+		return reader.readLine().split(" ");
+	}
 
-		boolean[] visited = new boolean[N];
-		int[] distance = new int[N];
-		Arrays.fill(distance, -1);
+	public static void main(String[] args) throws Exception {
+		String[] NM = readLine();
+		int N = Integer.parseInt(NM[0]);
+		int M = Integer.parseInt(NM[1]);
 
-		State initialState = new State(org, 1);
-		Queue<State> bfsQueue = new LinkedList<>();
-		bfsQueue.add(initialState);
+		DisjointSet disjointSet = new DisjointSet(N);
 
-		while (!bfsQueue.isEmpty()) {
-			State current = bfsQueue.poll();
+		for (int i = 0; i < M; i += 1) {
+			String[] command = readLine();
 
-			if (visited[current.nodeIndex] == true) {
-				continue;
-			}
+			int u = Integer.parseInt(command[1]);
+			int v = Integer.parseInt(command[2]);
 
-			visited[current.nodeIndex] = true;
-			distance[current.nodeIndex] = current.depth - 1;
-
-			for (int next : adj[current.nodeIndex]) {
-				if (visited[next] == false) {
-					State nextState = new State(next, current.depth + 1);
-					bfsQueue.add(nextState);
+			if (command[0].equals("LINK")) {
+				disjointSet.union(u, v);
+				int groupSize = disjointSet.getNumberOfConnectedNodes(u);
+				writer.write(String.format("SIZE = %d\n", groupSize));
+			} else if (command.equals("CHECK")) {
+				if (disjointSet.isConnected(u, v) == true) {
+					writer.write("Connected\n");
+				} else {
+					writer.write("Separated\n");
 				}
 			}
 
 		}
 
-		return distance[dest];
-	}
-
-	public static void main(String[] args) throws Exception {
-		int N = scanner.nextInt();
-		int M = scanner.nextInt();
-
-		int origin = scanner.nextInt();
-		int dest = scanner.nextInt();
-
-		ArrayList<Integer>[] adj = new ArrayList[N + 1];
-
-
-		for (int i = 1; i <= N; i += 1) {
-			adj[i] = new ArrayList<>();
-		}
-
-		for (int i = 0; i < M; i += 1) {
-			int u = scanner.nextInt();
-			int v = scanner.nextInt();
-			adj[u].add(v);
-			adj[v].add(u);
-		}
-
-		int answer = getShortestPathLength(origin, dest, adj);
-
-		System.out.println(answer);
+		reader.close();
+		writer.flush();
+		writer.close();
 	}
 
 }
 
-class State {
-	public final int nodeIndex;
-	public final int depth;
+class DisjointSet {
+	private final int size;
+	private int[] groupBoss;
+	private int[] groupSize;
 
-	public State(int nodeIndex, int depth) {
-		this.nodeIndex = nodeIndex;
-		this.depth = depth;
+	public DisjointSet(int size) {
+		this.size = size;
+		this.groupBoss = new int[size + 1];
+		this.groupSize = new int[size + 1];
+		for (int nodeIndex = 1; nodeIndex <= size; nodeIndex += 1) {
+			groupSize[nodeIndex] = 1;
+			groupBoss[nodeIndex] = nodeIndex;
+		}
+	}
+
+	public int getGroupBoss(int u) {
+		if (groupBoss[u] == u) {
+			return u;
+		} else {
+			groupBoss[u] = getGroupBoss(groupBoss[u]);
+			return groupBoss[u];
+		}
+	}
+
+	public void union(int u, int v) {
+		if(isConnected(u, v)){
+			return;
+		}
+
+		int uBoss = getGroupBoss(u);
+		int vBoss = getGroupBoss(v);
+		groupSize[uBoss] += groupSize[vBoss];
+		groupBoss[vBoss] = uBoss;
+	}
+
+	public boolean isConnected(int u, int v) {
+		int uBoss = getGroupBoss(u);
+		int vBoss = getGroupBoss(v);
+		return uBoss == vBoss;
+	}
+
+	public int getNumberOfConnectedNodes(int u) {
+		int uBoss = getGroupBoss(u);
+		return this.groupSize[uBoss];
 	}
 }

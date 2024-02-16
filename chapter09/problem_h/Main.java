@@ -1,111 +1,91 @@
-import java.lang.*;
+import java.io.*;
 import java.util.*;
+import java.lang.*;
 
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 
-	public static int[] computeShortestPaths(int V, Node[] nodes, Node origin) {
-		int[] distance = new int[V+1];
-		Arrays.fill(distance, Integer.MAX_VALUE);
+	public static void main(String[] args) {
+		int n = scanner.nextInt();
+		int[] signA = new int[n];
+		int[] signB = new int[n];
 
-		distance[origin.index]  = 0;
-
-		boolean updated = false;
-		for(int times = 1; times <= V; times += 1){
-			updated = false;
-
-			for(int current = 1; current <= V; current += 1){
-				if(distance[current] == Integer.MAX_VALUE){
-					continue;
-				}
-
-				for(Edge e : nodes[current].edges){
-					int next = e.dest.index;
-					int nextCost = distance[current] + e.weight;
-					if(distance[next] > nextCost ){
-						distance[next] = nextCost;
-						updated = true;
-					}
-				}
-			}
-
-			if(updated == false){
-				break;
-			}else if(times == V){
-				Arrays.fill(distance, Integer.MIN_VALUE);
-			}
+		for (int i = 0; i < n; i += 1) {
+			signA[i] = scanner.nextInt();
 		}
 
-		return distance;
-	}
-
-	public static void testCase(int caseIndex){
-		int N = scanner.nextInt();
-		int M = scanner.nextInt();
-		int W = scanner.nextInt();
-		int origin = 1;
-
-		Node[] nodes = new Node[N+1];
-		for(int i = 1; i <= N; i+= 1){
-			nodes[i] = new Node(i);
+		for (int i = 0; i < n; i += 1) {
+			signB[i] = scanner.nextInt();
 		}
 
-		for(int i = 0 ; i < M; i += 1){
-			int u = scanner.nextInt();
-			int v = scanner.nextInt();
-			int w = scanner.nextInt();
-			Edge e1 = new Edge(nodes[u], nodes[v], w);
-			Edge e2 = new Edge(nodes[v], nodes[u], w);
-			nodes[u].edges.add(e1);
-			nodes[v].edges.add(e2);
-		}
+		DTW dtw = new DTW(signA, signB);
 
-		for(int i = 0 ; i < W; i += 1){
-			int u = scanner.nextInt();
-			int v = scanner.nextInt();
-			int w = scanner.nextInt();
-			Edge e = new Edge(nodes[u], nodes[v], -w);
-			nodes[u].edges.add(e);
-		}
-
-		int[] distances = computeShortestPaths(N, nodes, nodes[origin]);
-
-		if(distances[origin] == Integer.MIN_VALUE){
-			System.out.println("YES");
-		}else{
-			System.out.println("NO");
-		}
-	}
-
-	public static void main(String[] args) throws Exception {
-		int caseSize = scanner.nextInt();
-		for(int caseIndex = 1; caseIndex <= caseSize ; caseIndex += 1){
-			testCase(caseIndex);
-		}
-	}
-
-}
-
-
-class Node{
-	public final int index;
-	public final ArrayList<Edge> edges;
-
-	public Node(int index){
-		this.index = index;
-		this.edges = new ArrayList<Edge>();
+		int answer = dtw.f(n - 1, n - 1);
+		System.out.println(answer);
 	}
 }
 
-class Edge{
-	public final Node origin;
-	public final Node dest;
-	public final int weight;
 
-	public Edge(Node origin, Node dest, int weight){
-		this.origin = origin;
-		this.dest = dest;
-		this.weight = weight;
+class DTW {
+	public static final int EMPTY = -1;
+	public static final int INFINITY = 1_000_000_000;
+
+	private int[] signA;
+	private int[] signB;
+	private int[][] memo;
+	private int n;
+	private int m;
+
+	public DTW(int[] signA, int[] signB) {
+		this.signA = signA.clone();
+		this.signB = signB.clone();
+		this.n = signA.length;
+		this.m = signB.length;
+		this.memo = new int[n][m];
+		for (int i = 0; i < n; i += 1) {
+			Arrays.fill(memo[i], EMPTY);
+		}
+	}
+
+	/**
+	 * 두 부분 파형 signA[0..lastIndexA], signB[0..lastIndexB]에 대한 최소의 거리
+	 * signA[lastIndexA]와 signB[lastIndexB]는 반드시 대응되어야 한다.
+	 *
+	 * @param lastIndexA
+	 * @param lastIndexB
+	 * @return 두 부분 파형에대한 최소 거리
+	 */
+	public int f(int lastIndexA, int lastIndexB) {
+		if (lastIndexA < 0 || lastIndexB < 0) {
+			return INFINITY;
+		} else if (memo[lastIndexA][lastIndexB] != EMPTY) {
+			return memo[lastIndexA][lastIndexB];
+		} else if (lastIndexA == 0 && lastIndexB == 0) {
+			// 시점이 하나씩 밖에 없는 경우 서로 대응된다 
+			int diff = signA[0] - signB[0];
+			return diff * diff;
+		}
+
+		// 해당 두 시점의 차이 값 
+		int diff = signA[lastIndexA] - signB[lastIndexB];
+		int error = diff * diff;
+
+		// 해당 두 시점 이전 시점들의 대응들에 대한 최적해와 더한다
+		int answer = error + MIN(
+				f(lastIndexA - 1, lastIndexB),
+				f(lastIndexA, lastIndexB - 1),
+				f(lastIndexA - 1, lastIndexB - 1)
+		);
+
+		return answer;
+	}
+
+	public static int MIN(int... arr) {
+		int min = arr[0];
+		for (int i = 0; i < arr.length; i += 1) {
+			min = Math.min(min, arr[i]);
+		}
+		return min;
 	}
 }

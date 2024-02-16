@@ -1,76 +1,65 @@
 #include <cstdio>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
-class DisjointSet {
+const int INF = 987654321;
+
+class Solution {
 public:
-	int size;
-	vector<int> groupBoss;
-	vector<int> groupSize;
+	vector<vector<int> > cost;
+	vector<vector<int> > memo;
+	int n;
 
-	DisjointSet(int size) {
-		this->size = size;
-		this->groupBoss = vector<int>(size + 1);
-		this->groupSize = vector<int>(size + 1, 1);
-		for (int nodeIndex = 1; nodeIndex <= size; nodeIndex += 1) {
-			groupBoss[nodeIndex] = nodeIndex;
+	Solution(vector<vector<int> > costMap) {
+		this->n = costMap.size();
+		this->cost = costMap;
+		this->memo = vector<vector<int> >(this->n, vector<int>(this->n, -1));
+	}
+
+
+	/**
+	 * (0, 0) ~ (lastRow, lastCol)까지만 고려했을 때 문제의 정답
+	 * 
+	 * @param lastRow		
+	 * @param lastCol
+	 * @return	최단경로들 중 가장 작은 난이도 합
+	 */
+	int f(int lastRow, int lastCol) {
+		if (lastCol < 0 || lastRow < 0) {
+			return INF;
+		} else if (memo[lastRow][lastCol] != -1) {
+			return memo[lastRow][lastCol];
+		} else if (lastRow == 0 && lastCol == 0) {
+			return cost[0][0];
 		}
+
+		int answer = min(
+			f(lastRow - 1, lastCol) + cost[lastRow][lastCol],
+			f(lastRow, lastCol - 1) + cost[lastRow][lastCol]
+		);
+
+		memo[lastRow][lastCol] = answer;
+		return answer;
 	}
 
-	int getGroupBoss(int u) {
-		if (groupBoss[u] == u) {
-			return u;
-		} else {
-			groupBoss[u] = getGroupBoss(groupBoss[u]);
-			return groupBoss[u];
-		}
-	}
-
-	void unionGroup(int u, int v) {
-		if(isConnected(u, v)) {
-			return;
-		}
-
-		int uBoss = getGroupBoss(u);
-		int vBoss = getGroupBoss(v);
-		groupSize[uBoss] += groupSize[vBoss];
-		groupBoss[vBoss] = uBoss;		
-	}
-
-	bool isConnected(int u, int v) {
-		int uBoss = getGroupBoss(u);
-		int vBoss = getGroupBoss(v);
-		return uBoss == vBoss;
-	}
-
-	int getNumberOfConnectedNodes(int u) {
-		int uBoss = getGroupBoss(u);
-		return this->groupSize[uBoss];
-	}
 };
 
 int main() {
-	int N, M;
-	scanf("%d%d", &N, &M);
+	int n;
+	scanf("%d", &n);
 
-	DisjointSet disjointSet(N);
-
-	for (int i = 0; i < M; i += 1) {
-		char command[10];
-		int u, v;
-		scanf("%s%d%d", command, &u, &v);
-		if (command[0] == 'L') {
-			disjointSet.unionGroup(u, v);
-			int groupSize = disjointSet.getNumberOfConnectedNodes(u);
-			printf("SIZE = %d\n", groupSize);
-		} else if (command[0] == 'C') {
-			if (disjointSet.isConnected(u, v) == true) {
-				puts("Connected");
-			} else {
-				puts("Separated");
-			}
+	vector<vector<int> > costMap(n, vector<int>(n));
+	for (int i = 0; i < n ; i += 1) {
+		for (int j = 0; j < n; j += 1) {
+			scanf("%d", &costMap[i][j]);
 		}
-
 	}
+
+
+	Solution solution(costMap);
+	int answer = solution.f(n - 1, n - 1);
+
+	printf("%d\n", answer);
 }

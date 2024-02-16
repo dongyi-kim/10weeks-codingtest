@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.*;
 import java.lang.*;
 
@@ -5,124 +6,163 @@ import java.lang.*;
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 
-	public static int MAX(int... arr) {
-		int max = arr[0];
-		for (int i = 0; i < arr.length; i += 1) {
-			max = Math.max(max, arr[i]);
+	public static void testCase(int caseIndex) {
+		double W = scanner.nextDouble();
+		int N = scanner.nextInt();
+
+		Sensor[] sensors = new Sensor[N];
+		for (int i = 0; i < N; i += 1) {
+			double x = scanner.nextDouble();
+			double y = scanner.nextDouble();
+			double r = scanner.nextDouble();
+			sensors[i] = new Sensor(x, y, r);
 		}
-		return max;
+
+		double answer = Solution.getMaximumPassableRadius(N, W, sensors);
+
+		System.out.printf("%.3f\n", answer);
 	}
 
 	public static void main(String[] args) {
-		int n = scanner.nextInt();
-		int[] profits = new int[n];
-		for (int i = 0; i < n; i += 1) {
-			profits[i] = scanner.nextInt();
+		int caseNum = scanner.nextInt();
+		for (int caseIndex = 1; caseIndex <= caseNum; caseIndex += 1) {
+			testCase(caseIndex);
 		}
-
-		int answer;
-
-		// 두 가지 방법을 완성해보세요
-
-		//[Solution A]
-		SolutionA solutionA = new SolutionA(profits);
-		answer = MAX(
-				solutionA.f(n - 1, 0),
-				solutionA.f(n - 1, 1),
-				solutionA.f(n - 1, 2)
-		);
-
-		//[Solution B]
-		SolutionB solutionB = new SolutionB(profits);
-		answer = 0;
-		for (int i = 0; i < n; i += 1) {
-			answer = Math.max(answer, solutionB.f(i));
-		}
-
-		System.out.println(answer);
 	}
 }
 
-class SolutionA {
-	private static int EMPTY = -1;
-	private int[][] memo;
-	private int[] profits;
-	private int n;
+class Solution {
+	public static final int ITERATION_COUNT = 100;
 
-	public SolutionA(int[] profits) {
-		this.n = profits.length;
-		this.profits = profits.clone();
-		this.memo = new int[n][3];
-		for (int i = 0; i < n; i += 1) {
-			Arrays.fill(memo[i], EMPTY);
+	/**
+	 * 해당 복도를 통과할 수 있는 가장 큰 반지름을 계산하여 반환한다
+	 *
+	 * @param N       센서들의 수
+	 * @param W       복도의 폭
+	 * @param sensors 각 센서들의 정보
+	 * @return 통과 가능한 가장 큰 반지름
+	 */
+	public static double getMaximumPassableRadius(int N, double W, Sensor[] sensors) {
+		double lowerBound = 0;
+		double upperBound = 100000;
+
+		// 특정 횟수만큼 정밀도를 높여가며 최적의 반지름을 찾아간다
+		for (int i = 0; i < ITERATION_COUNT; i += 1) {
+			// 범위의 중앙값을 반지름으로 사용한다
+			double radius = (lowerBound + upperBound) / 2.0;
+
+			// 해당 반지름으로 통과가 가능한지 검사한다
+			boolean possible = isPossible(N, W, radius, sensors);
+
+			if (possible) {
+				// 통과할 수 있다면 하한선을 증가시킨다
+				lowerBound = radius;
+			} else {
+				// 통과할 수 없다면 하한선을 감소시킨다
+				upperBound = radius;
+			}
 		}
+
+		return upperBound;
 	}
 
 	/**
-	 * lastIndex번째 날에 연속으로 count번째 근무한다면 얻을 수 있는 최대 인센티브
+	 * 물체의 반지름이 R일 때 복도를 통과할 수 있는지 검사한다
 	 *
-	 * @param lastIndex 고려할 마지막 날짜의 인덱스
-	 * @param count     연속으로 근무한 횟수
-	 * @return 해당 가정에서의 정답
+	 * @param N       센서들의 수
+	 * @param W       복도의 폭
+	 * @param R       테스트할 물체의 반지름
+	 * @param sensors 각 센서의 정보
+	 * @return 통과할 수 있다면 True, 아니면 False를 반환한다.
 	 */
-	public int f(int lastIndex, int count) {
-		if (lastIndex < 0 || count < 0 || count >= 3) {
-			return 0;
-		} else if (memo[lastIndex][count] != EMPTY) {
-			return memo[lastIndex][count];
+	public static boolean isPossible(int N, double W, double R, Sensor[] sensors) {
+		// 좌/우 벽을 각각 그래프의 노드로 선언한다
+		Node leftWall = new Node(N);
+		Node rightWall = new Node(N + 1);
+
+		// 각 센서들을 노드로 정의한다.
+		Node[] sensorNodes = new Node[N];
+
+		// 각 센서와 양쪽 벽 사이의 공간을 고려하여 그래프를 모델링한다
+		for (int i = 0; i < N; i += 1) {
+			sensorNodes[i] = new Node(i);
+
+			// 해당 센서와 왼쪽 벽 사이의 거리가 2R보다 작다면? 그 사이는 물체가 통과할 수 없다
+			if (sensors[i].xPos - sensors[i].radius - 2 * R < 0) {
+				leftWall.adjacentNodes.add(sensorNodes[i]);
+				sensorNodes[i].adjacentNodes.add(leftWall);
+			}
+
+			// 해당 센서와 오른쪽 벽 사이의 거리가 2R보다 작다면? 그 사이는 물체가 통과할 수 없다
+			if (sensors[i].xPos + sensors[i].radius + 2 * R > W) {
+				rightWall.adjacentNodes.add(sensorNodes[i]);
+				sensorNodes[i].adjacentNodes.add(rightWall);
+			}
 		}
 
-		int answer = 0;
-		if (count == 0) {
-			int caseA = f(lastIndex - 1, 0);
-			int caseB = f(lastIndex - 1, 1);
-			int caseC = f(lastIndex - 1, 2);
-			answer = Main.MAX(caseA, caseB, caseC);
-		} else {
-			answer = f(lastIndex - 1, count - 1) + profits[lastIndex];
+		// 서로 다른 두 센서 <i, j>사이에 대해 그래프를 모델링한다
+		for (int i = 0; i < N; i += 1) {
+			for (int j = i + 1; j < N; j += 1) {
+				double deltaX = sensors[i].xPos - sensors[j].xPos;
+				double deltaY = sensors[i].yPos - sensors[j].yPos;
+				double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+				// 두 센서 영역 사이의 빈 공간이 2R보다 작다면? 두 센서 사이에는 물체가 통과할 수 없다.
+				if (distance - sensors[i].radius - sensors[j].radius < 2 * R) {
+					sensorNodes[i].adjacentNodes.add(sensorNodes[j]);
+					sensorNodes[j].adjacentNodes.add(sensorNodes[i]);
+				}
+			}
 		}
 
-		memo[lastIndex][count] = answer;
-		return memo[lastIndex][count];
+		// 왼쪽 벽이 오른쪽 벽과 연결성이 존재한다면?
+		// 해당 복도를 통과할 수 없다는 뜻이 된다.
+		// 이를 DFS로 검사한다.
+		boolean[] visited = new boolean[N + 2];
+		Arrays.fill(visited, false);
+
+		Stack<Node> dfsStack = new Stack<>();
+		dfsStack.add(leftWall);
+
+		while (dfsStack.isEmpty() == false) {
+			Node currentNode = dfsStack.pop();
+			if (visited[currentNode.index] == true) {
+				continue;
+			}
+
+			visited[currentNode.index] = true;
+
+			for (Node nextNode : currentNode.adjacentNodes) {
+				if (visited[nextNode.index] == false) {
+					dfsStack.add(nextNode);
+				}
+			}
+		}
+
+		return !visited[rightWall.index];
 	}
-
 }
 
-class SolutionB {
-	private static int EMPTY = -1;
-	private int[] memo;
-	private int[] profits;
-	private int n;
+class Sensor {
+	public final double xPos;    // 센서의 중심점의 x좌표
+	public final double yPos;    // 센서의 중심점의 y좌표
+	public final double radius; // 센서의 감지범위 반지름
 
-	public SolutionB(int[] profits) {
-		this.n = profits.length;
-		this.profits = profits.clone();
-		this.memo = new int[n];
-		Arrays.fill(memo, EMPTY);
+	public Sensor(double xPos, double yPos, double radius) {
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.radius = radius;
+	}
+}
+
+class Node {
+	public final ArrayList<Node> adjacentNodes;    // 인접 노드 목록
+	public final int index;                        // 해당 노드의 인덱스
+
+	public Node(int index) {
+		this.index = index;
+		this.adjacentNodes = new ArrayList<>();
 	}
 
-	/**
-	 * profits[0] ~ profits[lastIndex]까지만 고려했을 때의 정답
-	 * 단, profits[lastIndex]는 무조건 마지막으로 사용한다.
-	 *
-	 * @param lastIndex 마지막으로 근무할 날의 인덱스
-	 * @return 'lastIndex'번째 날에 마지막으로 근무 했을 때 얻을 수 있는 최대 인센티브
-	 */
-	public int f(int lastIndex) {
-		if (lastIndex < 0) {
-			return 0;
-		} else if (memo[lastIndex] != EMPTY) {
-			return memo[lastIndex];
-		} else if (lastIndex == 0) {
-			return profits[0];
-		}
 
-		int answer = Math.min(
-			f(lastIndex - 2) + profits[lastIndex],
-			f(lastIndex - 3) + profits[lastIndex - 1] + profits[lastIndex]
-		);
-
-		memo[lastIndex] = answer;
-		return memo[lastIndex];
-	}
 }

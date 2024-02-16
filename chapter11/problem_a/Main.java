@@ -2,89 +2,125 @@ import java.io.*;
 import java.util.*;
 import java.lang.*;
 
-
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 
-
-	public static void testCase(int caseIndex) {
-		int N = scanner.nextInt();
-		long M = scanner.nextLong();
-		long[] S = new long[N];
-		long[] V = new long[N];
-		for (int i = 0; i < N; i += 1) {
-			S[i] = scanner.nextLong();
-		}
-		for (int i = 0; i < N; i += 1) {
-			V[i] = scanner.nextLong();
-		}
-
-		long maximumSpeed = Solution.getMaximumSpeed(N, M, S, V);
-
-		System.out.println(maximumSpeed);
-	}
-
 	public static void main(String[] args) {
-		int caseNum = scanner.nextInt();
-		for (int caseIndex = 1; caseIndex <= caseNum; caseIndex += 1) {
-			testCase(caseIndex);
+		String S = scanner.next();
+		String P = scanner.next();
+
+		ArrayList<Integer> indexes
+				= RabinKarp.getMatchedIndexes(S, P);
+
+		if (indexes.size() == 0) {
+			System.out.println("Not Matched");
+		} else {
+			StringBuilder output = new StringBuilder();
+			for (int i = 0; i < indexes.size(); i += 1) {
+				if (i > 0) {
+					output.append(" ");
+				}
+				output.append(indexes.get(i));
+			}
+			System.out.println(output.toString());
 		}
 	}
 }
 
-class Solution{
+class RabinKarp {
+	public static final long MODULAR = 1000000007;
+	public static final long BASE = 257;
 
 	/**
-	 * @brief 총 M의 예산을 투자하여 가장 느린 기차의 속도 최대값
+	 * 라빈카프 알고리즘 기반으로
 	 *
-	 * @param N  기차의 수
-	 * @param M  총 예산
-	 * @param S  S[i] := 각 열차의 초기 속력
-	 * @param V  V[i] := 각 열차의 단위 예산당 속도 증가량
+	 * @param S
+	 * @param P
 	 * @return
 	 */
-	public static long getMaximumSpeed(int N, long M, long[] S, long[] V){
-		long lowerBound = 0;				// 속도는 최소 0이므로
-		long upperBound = 200000000000L;	// 이론상 최대 속력
+	public static ArrayList<Integer> getMatchedIndexes(String S, String P) {
+		int N = S.length();    // 대상 문자열의 길이
+		int M = P.length(); // 패턴 문자열의 길이
 
-		while(lowerBound < upperBound){ // 범위가 하나로 정해질 때 까지
-			long minimumSpeed = (lowerBound + upperBound + 1) / 2; // 중간값 계산 후 테스트
-			boolean possible = isPossible(N, M, minimumSpeed, S, V);
-
-			if(possible){	 // 가능하다면, 그 이상의 속도로 범위를 좁힌다
-				lowerBound = minimumSpeed;
-			}else{			// 불가능하다면, 그 이하의 속도로 범위를 좁힌다.
-				upperBound = minimumSpeed - 1;
-			}
+		if (N < M) {        // 패턴이 더 긴 경우는 존재하지 않는다.
+			return new ArrayList<>();
 		}
 
-		// 결과를 반환한다
-		return lowerBound;
+		long[] weights = getWeightTable(M);    // 각 자리별 가중치 테이블을 계산한다 - O(M)
+		long hashP = getHash(P, weights);    // 패턴 문자열에 대한 해시 값을 계산한다 - O(M)
+		long hashS = getHash(S.substring(0, M), weights); // 대상 문자열의 가장 앞 부분 문자열의 해시를 계산한다 - O(M)
+
+		ArrayList<Integer> matchedIndexes = new ArrayList<>();
+
+		if (hashP == hashS) {    // 두 해시값이 같다면, 가장 앞 부분 문자열은 패턴과 일치한다 (편의상 따로 처리)
+			matchedIndexes.add(0);
+		}
+
+		for (int begin = 1; begin + M - 1 < N; begin += 1) {
+			// 각 부분 문자열 [ begin, begin + M - 1 ] 에 대해
+
+			// 이전 영역의 해시 값을 사용하여, 이번 범위의 해시 값을 계산한다 - O(f(M)) = O(1)
+			hashS = (hashS - S.charAt(begin - 1) * weights[M - 1]) % MODULAR;
+			hashS = (hashS * BASE) % MODULAR;
+			hashS = (hashS + S.charAt(begin + M - 1) * weights[0]) % MODULAR;
+			if (hashS < 0) {	// 모듈러 값이 음수가 되는 경우 예외처리
+				hashS += MODULAR;
+			}
+
+			if (hashP == hashS) {	// 패턴 문자열과 해시 값이 일치한다면 직접 문자열을 비교한다.
+				boolean equal = true;
+				for (int matched = 0; matched < M; matched += 1) {
+					if (S.charAt(begin + matched) != P.charAt(matched)) {
+						equal = false;
+						break;
+					}
+				}
+
+				// 직접 비교 결과, 두 문자열이 같다면 패턴이 매칭된 것으로 처리한다.
+				if (equal) {
+					matchedIndexes.add(begin);
+				}
+			}
+		}
+		return matchedIndexes;
 	}
 
 	/**
-	 * 총 M의 예산으로 최저 속도 하한선 달성 여부를 검사하는 함수
-	 * @param N				열차의 수
-	 * @param M				총 예산
-	 * @param minimumSpeed	속도 하한선
-	 * @param S				각 열차의 초기 속도
-	 * @param V				각 열차의 예산당 속도 증가량
-	 * @return				실현 가능 여부
+	 * 각 자리 별 Weight를 계산해둔 배열을 반환하는 함수
+	 *
+	 * @param M 패턴 문자열의 길이
+	 * @return weights[i] := 오른쪽에서 i번째 문자에 곱할 가중치
 	 */
-	public static boolean isPossible(int N, long M, long minimumSpeed, long[] S, long[] V){
-		long totalBudget = M;	// 총 예산
+	public static long[] getWeightTable(int M) {
+		long[] weights = new long[M + 1];
 
-		for(int i = 0 ; i < N ; i += 1){ // 모든 열차에 대해
-			if(minimumSpeed <= S[i]){ // 이미 하한 속도를 넘겼다면 건너뛴다.
-				continue;
-			}
-
-			long diff = minimumSpeed - S[i]; 		// 늘려야 할 속도 량
-			long budgetCost = (diff-1) / V[i] + 1;	// 그리고 그 때 필요한 비용
-
-			totalBudget -= budgetCost;		// 해당 비용을 전체 예산에서 감산한다
+		weights[0] = 1;
+		for (int i = 1; i < weights.length; i += 1) {
+			weights[i] = (weights[i - 1] * BASE) % MODULAR;
 		}
 
-		return (totalBudget >= 0);	// 예산 M이내로 모두 충당이 가능하면 true
+		return weights;
+	}
+
+	/**
+	 * 주어진 Weight 테이블을 사용해 문자열 P의 해시 값을 계산하는 함수
+	 *
+	 * @param P       해시 값을 계산할 문자열
+	 * @param weights 각 자리별 가중치 테이블
+	 * @return
+	 */
+	public static long getHash(String P, long[] weights) {
+		long hash = 0;
+
+		final int M = P.length();
+
+		for (int i = 0; i < M; i += 1) {
+			int position = M - i - 1;
+
+			hash += P.charAt(i) * weights[position];
+			hash %= MODULAR;
+		}
+
+		return hash;
 	}
 }

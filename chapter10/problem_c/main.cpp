@@ -1,108 +1,149 @@
 #include <cstdio>
 #include <vector>
-#include <algorithm>
+#include <stack>
+#include <cmath>
 
 using namespace std;
 
-
-class SolutionA {
+class Sensor {
 public:
-	vector<vector<int> > memo;
-	vector<int> profits;
-	int n;
+	double xPos;    // 센서의 중심점의 x좌표
+	double yPos;    // 센서의 중심점의 y좌표
+	double radius; // 센서의 감지범위 반지름
 
-	SolutionA(vector<int> profits) {
-		this->n = profits.size();
-		this->profits = profits;
-		this->memo = vector<vector<int> >(profits.size(), vector<int>(3, -1));
-	}
-
-	/**
-	 * lastIndex번째 날에 연속으로 count번째 근무한다면 얻을 수 있는 최대 인센티브
-	 *
-	 * @param lastIndex 고려할 마지막 날짜의 인덱스
-	 * @param count     연속으로 근무한 횟수
-	 * @return 해당 가정에서의 정답
-	 */
-	int f(int lastIndex, int count) {
-		if (lastIndex < 0 || count < 0 || count >= 3) {
-			return 0;
-		} else if (memo[lastIndex][count] != -1) {
-			return memo[lastIndex][count];
-		}
-
-		int answer = 0;
-		if (count == 0) {
-			int caseA = f(lastIndex - 1, 0);
-			int caseB = f(lastIndex - 1, 1);
-			int caseC = f(lastIndex - 1, 2);
-			answer = max(caseA, max(caseB, caseC));
-		} else {
-			answer = f(lastIndex - 1, count - 1) + profits[lastIndex];
-		}
-
-		memo[lastIndex][count] = answer;
-		return memo[lastIndex][count];
-	}
-
-};
-
-class SolutionB {
-public:
-	vector<int> memo;
-	vector<int> profits;
-	int n;
-
-	SolutionB(vector<int> profits) {
-		this->n = profits.size();
-		this->profits = profits;
-		this->memo = vector<int>(profits.size(), -1);
-	}
-
-	/**
-	 * profits[0] ~ profits[lastIndex]까지만 고려했을 때의 정답
-	 * 단, profits[lastIndex]는 무조건 마지막으로 사용한다.
-	 *
-	 * @param lastIndex 마지막으로 근무할 날의 인덱스
-	 * @return 'lastIndex'번째 날에 마지막으로 근무 했을 때 얻을 수 있는 최대 인센티브
-	 */
-	int f(int lastIndex) {
-		if (lastIndex < 0) {
-			return 0;
-		} else if (memo[lastIndex] != -1) {
-			return memo[lastIndex];
-		}
-
-		int answer = max(
-			f(lastIndex - 2) + profits[lastIndex],
-			f(lastIndex - 3) + profits[lastIndex - 1] + profits[lastIndex]
-		);
-		
-		memo[lastIndex] = answer;
-		return memo[lastIndex];
+	Sensor(double xPos, double yPos, double radius) {
+		this->xPos = xPos;
+		this->yPos = yPos;
+		this->radius = radius;
 	}
 };
 
-int main() {
-	int n;
-	scanf("%d", &n);
+/**
+ * 물체의 반지름이 R일 때 복도를 통과할 수 있는지 검사한다
+ *
+ * @param N       센서들의 수
+ * @param W       복도의 폭
+ * @param R       테스트할 물체의 반지름
+ * @param sensors 각 센서의 정보
+ * @return 통과할 수 있다면 True, 아니면 False를 반환한다.
+ */
+bool isPossible(int N, double W, double R, const vector<Sensor>& sensors) {
+	// 각 센서들을 노드로 정의한다.
+	// 좌/우 벽을 각각 그래프의 노드로 선언한다
+	vector<vector<int> > nodes(N + 2);
 
-	vector<int> profits(n);
-	for (int i = 0; i < n; i += 1) {
-		scanf("%d", &profits[i]);
+	// 각 센서와 양쪽 벽 사이의 공간을 고려하여 그래프를 모델링한다
+	for (int i = 0; i < N; i += 1) {
+
+		// 해당 센서와 왼쪽 벽 사이의 거리가 2R보다 작다면? 그 사이는 물체가 통과할 수 없다
+		if (sensors[i].xPos - sensors[i].radius - 2 * R < 0) {
+			nodes[N].push_back(i);
+			nodes[i].push_back(N);
+		}
+
+		// 해당 센서와 오른쪽 벽 사이의 거리가 2R보다 작다면? 그 사이는 물체가 통과할 수 없다
+		if (sensors[i].xPos + sensors[i].radius + 2 * R > W) {
+			nodes[N + 1].push_back(i);
+			nodes[i].push_back(N + 1);
+		}
 	}
 
-	int answer;
-	// 두 가지 방법을 완성해보세요
-	//[Solution A]
-	// SolutionA solutionA(profits);
-	// answer = max(solutionA.f(n - 1, 0), max(solutionA.f(n - 1, 1), solutionA.f(n - 1, 2)));
+	// 서로 다른 두 센서 <i, j>사이에 대해 그래프를 모델링한다
+	for (int i = 0; i < N; i += 1) {
+		for (int j = i + 1; j < N; j += 1) {
+			double deltaX = sensors[i].xPos - sensors[j].xPos;
+			double deltaY = sensors[i].yPos - sensors[j].yPos;
+			double distance = sqrt(deltaX * deltaX + deltaY * deltaY);
 
-	// //[Solution B]
-	// SolutionB solutionB(profits);
-	// answer = 0;
-	// for(int i = 0 ; i < n ; i+= 1){
-	// 	answer = max(answer, solutionB.f(i));
-	// }
+			// 두 센서 영역 사이의 빈 공간이 2R보다 작다면? 두 센서 사이에는 물체가 통과할 수 없다.
+			if (distance - sensors[i].radius - sensors[j].radius < 2 * R) {
+				nodes[i].push_back(j);
+				nodes[j].push_back(i);
+			}
+		}
+	}
+
+	// 왼쪽 벽이 오른쪽 벽과 연결성이 존재한다면?
+	// 해당 복도를 통과할 수 없다는 뜻이 된다.
+	// 이를 DFS로 검사한다.
+	vector<bool> visited(N + 2, false);
+
+	stack<int> dfsStack;
+	dfsStack.push(N);
+
+	while (dfsStack.empty() == false) {
+		int currentNode = dfsStack.top();
+		dfsStack.pop();
+		if (visited[currentNode] == true) {
+			continue;
+		}
+
+		visited[currentNode] = true;
+
+		for (int i = 0; i < nodes[currentNode].size() ; i += 1) {
+			int nextNode = nodes[currentNode][i];
+			if (!visited[nextNode]) {
+				dfsStack.push(nextNode);
+			}
+		}
+	}
+
+	return !visited[N + 1];
 }
 
+/**
+ * 해당 복도를 통과할 수 있는 가장 큰 반지름을 계산하여 반환한다
+ *
+ * @param N       센서들의 수
+ * @param W       복도의 폭
+ * @param sensors 각 센서들의 정보
+ * @return 통과 가능한 가장 큰 반지름
+ */
+double getMaximumPassableRadius(int N, double W, const vector<Sensor>& sensors) {
+	double lowerBound = 0;
+	double upperBound = 100000;
+
+	// 특정 횟수만큼 정밀도를 높여가며 최적의 반지름을 찾아간다
+	for (int i = 0; i < 100; i += 1) {
+		// 범위의 중앙값을 반지름으로 사용한다
+		double radius = (lowerBound + upperBound) / 2.0;
+
+		// 해당 반지름으로 통과가 가능한지 검사한다
+		bool possible = isPossible(N, W, radius, sensors);
+
+		if (possible) {
+			// 통과할 수 있다면 하한선을 증가시킨다
+			lowerBound = radius;
+		} else {
+			// 통과할 수 없다면 하한선을 감소시킨다
+			upperBound = radius;
+		}
+	}
+
+	return upperBound;
+}
+
+void testCase() {
+	double W;
+	int N;
+	scanf("%lf%d", &W, &N);
+
+	vector<Sensor> sensors;
+	for (int i = 0; i < N; i += 1) {
+		double x, y, r;
+		scanf("%lf%lf%lf", &x, &y, &r);
+		sensors.push_back(Sensor(x, y, r));
+	}
+
+	double answer = getMaximumPassableRadius(N, W, sensors);
+
+	printf("%.3f\n", answer);
+}
+
+int main() {
+	int caseNum;
+	scanf("%d", &caseNum);
+	for (int caseIndex = 1; caseIndex <= caseNum; caseIndex += 1) {
+		testCase();
+	}
+}

@@ -4,73 +4,121 @@ import java.util.*;
 
 
 public class Main {
-	public static final int NO_PARENT = -1;
-
 	public static final Scanner scanner = new Scanner(System.in);
 
+	public static boolean isConnectedGraph(Graph graph) {
+		Queue<Integer> reachableNodes = new LinkedList();
 
-	/**
-	 * 두 노드 current부터 goal까지의 최장 경로의 길이를 반환하는 함수
-	 *
-	 * @param current
-	 * @param goal
-	 * @param adj
-	 * @return
-	 */
-	public static int getLongestPathLength(int current, int goal, ArrayList<Integer>[] adj){
-		int N = adj.length;
-		boolean[] visited = new boolean[N];
-		return getLongestPathLength(current, goal, 1, adj, visited);
-	}
+		boolean[] visited = new boolean[graph.V + 1];
 
-	public static final int NOPATH = -100;	// 경로가 없는 경우 길이를 음수로 표현하자 
-	public static int getLongestPathLength(int current, int goal, int depth, ArrayList<Integer>[] adj, boolean[] visited){
-		if( visited[current] == true ){	// 이미 방문한 노드라면 경로를 만들 수 없다 
-			return NOPATH;
-		} else if(current == goal){	// 목적지라면 0부터 역으로 길이를 가산해나가자
-			return 0;
+		int originNode = 1;
+		int visitCount = 0;
+		reachableNodes.add(originNode);
+		while (reachableNodes.isEmpty() == false) {
+			int currentNode = reachableNodes.poll();
+
+			if (visited[currentNode] == true) {
+				continue;
+			}
+
+			visited[currentNode] = true;
+			visitCount += 1;
+
+			for (int nextNode = 1; nextNode <= graph.V; nextNode += 1) {
+				if (graph.hasEdge(currentNode, nextNode)) {
+					reachableNodes.add(nextNode);
+				}
+			}
 		}
 
-		int maxLength = NOPATH;
-
-		visited[current] = true;
-		for(int nextNode : adj[current]){
-
-			int length = 1 + getLongestPathLength(nextNode, goal, depth+1, adj, visited);
-			maxLength = Math.max(maxLength , length);
-
-		}
-		visited[current] = false;
-		return maxLength;
-
+		return visitCount == graph.V;
 	}
 
+	public static boolean hasEulerPath(Graph graph) {
+		if (false == isConnectedGraph(graph)) {
+			return false;
+		}
+
+		int oddDegree = 0;
+		for (int node = 1; node <= graph.V; node += 1) {
+			int degree = graph.getDegree(node);
+			if (degree % 2 == 1) {
+				oddDegree += 1;
+			}
+		}
+
+		return oddDegree == 0 || oddDegree == 2;
+	}
+
+	public static boolean hasEulerCircuit(Graph graph) {
+		if (false == isConnectedGraph(graph)) {
+			return false;
+		}
+
+		int oddDegree = 0;
+		for (int node = 1; node <= graph.V; node += 1) {
+			int degree = graph.getDegree(node);
+			if (degree % 2 == 1) {
+				oddDegree += 1;
+				break;
+			}
+		}
+
+		return oddDegree == 0;
+	}
 
 	public static void main(String[] args) throws Exception {
-		int N = scanner.nextInt();
-		int M = scanner.nextInt();
-		ArrayList<Integer>[] adj = new ArrayList[N+1];
+		int V = scanner.nextInt();
 
-		int origin = scanner.nextInt();
-		int dest = scanner.nextInt();
-
-		for(int i = 1; i <= N; i += 1){
-			adj[i] = new ArrayList<>();
+		Graph graph = new Graph(V);
+		for (int u = 1; u <= V; u += 1) {
+			for (int v = 1; v <= V; v += 1) {
+				int exist = scanner.nextInt();
+				if (exist == 1) {
+					graph.addEdge(u, v);
+				}
+			}
 		}
 
-		for(int i = 0 ; i < M; i += 1){
-			int u = scanner.nextInt();
-			int v = scanner.nextInt();
-			adj[u].add(v);
-			adj[v].add(u);
+		if (hasEulerPath(graph)) {
+			System.out.println("YES");
+		} else {
+			System.out.println("NO");
 		}
 
-		int answer = getLongestPathLength(origin, dest, adj);
-		if(answer < 0){
-			System.out.println(0); // 경로가 존재하지 않는다
-		}else{
-			System.out.println(answer);
+		if (hasEulerCircuit(graph)) {
+			System.out.println("YES");
+		} else {
+			System.out.println("NO");
 		}
+	}
+
+}
+
+class Graph {
+	public final int V;
+	private boolean[][] adj;
+	private int[] degree;
+
+	public Graph(int V) {
+		this.adj = new boolean[V + 1][V + 1];
+		this.V = V;
+		this.degree = new int[V + 1];
+	}
+
+	public void addEdge(int u, int v) {
+		adj[u][v] = adj[v][u] = true;
+
+		degree[u] += 1;
+		degree[v] += 1;
+	}
+
+	public boolean hasEdge(int u, int v) {
+		return adj[u][v];
+	}
+
+	public int getDegree(int nodeIndex) {
+		return this.degree[nodeIndex];
 	}
 
 }

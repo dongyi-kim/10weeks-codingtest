@@ -1,101 +1,79 @@
-import java.lang.*;
+import java.io.*;
 import java.util.*;
+import java.lang.*;
 
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 
-	public static Edge[] getMinimumSpanningTree(int V, int E, Edge[] edges){
-		// 트리는 항상 V-1개의 간선이 있다.
-		Edge[] spanningTree = new Edge[V-1];
-
-		// 빈 그래프 G에 대한 disjointSet을 선언한다
-		DisjointSet disjointSet = new DisjointSet(V);
-
-		// 간선들을 오름차순으로 정렬한다
-		Arrays.sort(edges);
-
-		int mstIndex = 0;
-		for(Edge e : edges){
-			// 모든 간선 e에 대해
-			if(disjointSet.find(e.nodeU) == disjointSet.find(e.nodeV)){
-				// 이미 해당 두 정점이 연결성이 존재한다면 이 간선은 무시한다.
-				continue;
-			}else{
-				// 그렇지 않다면 이 간선을 그래프 G에 추가한다.
-				spanningTree[mstIndex ++] = e;
-				disjointSet.union(e.nodeU, e.nodeV);
+	public static void main(String[] args) {
+		int n = scanner.nextInt();
+		int m = scanner.nextInt();
+		int[][] values = new int[n][n];
+		for (int r = 0; r < n; r += 1) {
+			for (int c = 0; c < n; c += 1) {
+				values[r][c] = scanner.nextInt();
 			}
 		}
 
-		return spanningTree;
-	}
+		RangeSum rangeSum = new RangeSum(values);
 
-	public static void main(String[] args) throws Exception {
-		int V = scanner.nextInt();
-		int E = scanner.nextInt();
+		for (int i = 0; i < m; i += 1) {
+			int minRow = scanner.nextInt() - 1;
+			int minCol = scanner.nextInt() - 1;
+			int maxRow = scanner.nextInt() - 1;
+			int maxCol = scanner.nextInt() - 1;
+			int sum = 0;
+			sum += rangeSum.f(maxRow, maxCol);
+			sum -= rangeSum.f(maxRow, minCol - 1);
+			sum -= rangeSum.f(minRow - 1, maxCol);
+			sum += rangeSum.f(minRow - 1, maxCol - 1);
 
-		Edge[] edges = new Edge[E];
-		for(int i = 0 ; i < E; i += 1){
-			int u = scanner.nextInt();
-			int v = scanner.nextInt();
-			int w = scanner.nextInt();
-			edges[i] = new Edge(u, v, w);
+			System.out.println(sum);
 		}
-
-		Edge[] spanningTree = getMinimumSpanningTree(V, E, edges);
-
-		long weightSum = 0;
-		for(Edge e : spanningTree){
-			weightSum += e.weight;
-		}
-
-		System.out.println(weightSum);
-	}
-
-}
-
-class Edge implements Comparable<Edge>{
-	public final int nodeU;
-	public final int nodeV;
-	public final int weight;
-
-	public Edge(int nodeU, int nodeV, int weight){
-		this.nodeU = nodeU;
-		this.nodeV = nodeV;
-		this.weight = weight;
-	}
-
-	@Override
-	public int compareTo(Edge other) {
-		return this.weight - other.weight;
 	}
 }
 
-class DisjointSet {
-	private final int size;
-	private int[] groupBoss;
+class RangeSum {
+	private static int EMPTY = Integer.MIN_VALUE;
+	private int[][] memo;
+	private int[][] values;
+	private int n;
 
-	public DisjointSet(int size) {
-		this.size = size;
-		this.groupBoss = new int[size + 1];
-		for (int nodeIndex = 1; nodeIndex <= size; nodeIndex += 1) {
-			groupBoss[nodeIndex] = nodeIndex;
+	public RangeSum(int[][] values) {
+		this.n = values.length;
+		this.values = new int[n][n];
+		this.memo = new int[n][n];
+		for (int i = 0; i < n; i += 1) {
+			for (int j = 0; j < n; j += 1) {
+				this.memo[i][j] = EMPTY;
+				this.values[i][j] = values[i][j];
+			}
 		}
 	}
 
-	public int find(int u) {
-		if (groupBoss[u] == u) {
-			return u;
-		} else {
-			groupBoss[u] = find(groupBoss[u]);
-			return groupBoss[u];
+	/**
+	 * values[0][0] ~ values[lastRow][lastCol] 까지의 직사각형 누적합을 계산하는 함수
+	 *
+	 * @param lastRow 마지막 행 번호
+	 * @param lastCol 마지막 열 번호
+	 * @return 해당 범위의 누적합
+	 */
+	public int f(int lastRow, int lastCol) {
+		if (lastCol < 0 || lastRow < 0) {
+			return 0;
+		} else if (memo[lastRow][lastCol] != EMPTY) {
+			return memo[lastRow][lastCol];
+		} else if (lastRow == 0 && lastCol == 0) {
+			return values[0][0];
 		}
-	}
 
-	public void union(int u, int v) {
-		int uBoss = find(u);
-		int vBoss = find(v);
-		groupBoss[vBoss] = uBoss;
+		memo[lastRow][lastCol]
+				= values[lastRow][lastCol]
+				+ f(lastRow - 1, lastCol)
+				+ f(lastRow, lastCol - 1)
+				- f(lastRow - 1, lastCol - 1);
+
+		return memo[lastRow][lastCol];
 	}
 }

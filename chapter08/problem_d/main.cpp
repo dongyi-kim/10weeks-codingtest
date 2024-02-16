@@ -1,74 +1,76 @@
 #include <cstdio>
 #include <vector>
-#include <queue>
 
 using namespace std;
 
-class State {
+class DisjointSet {
 public:
-	int nodeIndex;
-	int depth;
+	int size;
+	vector<int> groupBoss;
+	vector<int> groupSize;
 
-	State(int nodeIndex, int depth) {
-		this->nodeIndex = nodeIndex;
-		this->depth = depth;
+	DisjointSet(int size) {
+		this->size = size;
+		this->groupBoss = vector<int>(size + 1);
+		this->groupSize = vector<int>(size + 1, 1);
+		for (int nodeIndex = 1; nodeIndex <= size; nodeIndex += 1) {
+			groupBoss[nodeIndex] = nodeIndex;
+		}
+	}
+
+	int getGroupBoss(int u) {
+		if (groupBoss[u] == u) {
+			return u;
+		} else {
+			groupBoss[u] = getGroupBoss(groupBoss[u]);
+			return groupBoss[u];
+		}
+	}
+
+	void unionGroup(int u, int v) {
+		if(isConnected(u, v)) {
+			return;
+		}
+
+		int uBoss = getGroupBoss(u);
+		int vBoss = getGroupBoss(v);
+		groupSize[uBoss] += groupSize[vBoss];
+		groupBoss[vBoss] = uBoss;		
+	}
+
+	bool isConnected(int u, int v) {
+		int uBoss = getGroupBoss(u);
+		int vBoss = getGroupBoss(v);
+		return uBoss == vBoss;
+	}
+
+	int getNumberOfConnectedNodes(int u) {
+		int uBoss = getGroupBoss(u);
+		return this->groupSize[uBoss];
 	}
 };
 
-/**
- * 그래프의 두 노드 org에서 dest로 이동하는 가장 짧은 경로의 길이를 반환하는 함수
- * 
- * @param org
- * @param dest
- * @param adj
- * @return
- */
-int getShortestPathLength(int org, int dest, const vector<vector<int> >& adj) {
-	int N = adj.size();
-
-	vector<bool> visited(N + 1, false);
-	vector<int> distance(N + 1, -1);
-
-	State initialState(org, 1);
-	queue<State> bfsQueue;
-	bfsQueue.push(initialState);
-
-	while (!bfsQueue.empty()) {
-		State current = bfsQueue.front();
-		bfsQueue.pop();
-
-		if (visited[current.nodeIndex] == true) {
-			continue;
-		}
-
-		visited[current.nodeIndex] = true;
-		distance[current.nodeIndex] = current.depth - 1;
-
-		for (int i = 0; i < adj[current.nodeIndex].size(); i += 1) {
-			int next = adj[current.nodeIndex][i];	
-			if (visited[next] == false) {
-				State nextState(next, current.depth + 1);
-				bfsQueue.push(nextState);
-			}
-		}
-	}
-
-	return distance[dest];
-}
-
 int main() {
-	int N, M, origin, dest;
-	scanf("%d%d%d%d", &N, &M, &origin, &dest);
+	int N, M;
+	scanf("%d%d", &N, &M);
 
-	vector<vector<int> > adj(N + 1);
+	DisjointSet disjointSet(N);
 
 	for (int i = 0; i < M; i += 1) {
+		char command[10];
 		int u, v;
-		scanf("%d%d", &u, &v);
-		adj[u].push_back(v);
-		adj[v].push_back(u);
-	}
+		scanf("%s%d%d", command, &u, &v);
+		if (command[0] == 'L') {
+			disjointSet.unionGroup(u, v);
+			int groupSize = disjointSet.getNumberOfConnectedNodes(u);
+			printf("SIZE = %d\n", groupSize);
+		} else if (command[0] == 'C') {
+			if (disjointSet.isConnected(u, v) == true) {
+				puts("Connected");
+			} else {
+				puts("Separated");
+			}
+		}
 
-	int answer = getShortestPathLength(origin, dest, adj);
-	printf("%d\n", answer);
+	}
 }

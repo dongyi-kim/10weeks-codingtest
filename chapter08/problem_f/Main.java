@@ -1,4 +1,3 @@
-import java.io.*;
 import java.lang.*;
 import java.util.*;
 
@@ -6,81 +5,98 @@ import java.util.*;
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 
-	public static int getShortestPathLength(int originR, int originC, int destR, int destC, int R, int C, boolean[][] passable) {
-		boolean[][] visited = new boolean[R + 2][C + 2];
-		int[][] distance = new int[R + 2][C + 2];
+	public static Edge[] getMinimumSpanningTree(int V, int E, Node[] nodes){
 
-		Queue<State> bfsQueue = new LinkedList<>();
-		State initialState = new State(originR, originC, 1);
-		bfsQueue.add(initialState);
+		int mstIndex = 0;
+		Edge[] spanningTree = new Edge[V-1];
 
-		while (!bfsQueue.isEmpty()) {
-			State current = bfsQueue.poll();
+		int origin = 1;
 
-			if (current.row < 1 || current.col < 1 || current.row > R || current.col > C) {
-				continue;
-			} else if (visited[current.row][current.col] == true || passable[current.row][current.col] == false) {
+		PriorityQueue<Edge> usableEdges = new PriorityQueue<>();
+		for(Edge e : nodes[origin].edges){
+			usableEdges.add(e);
+		}
+
+		boolean[] visited = new boolean[V+1];
+		visited[origin] = true;
+
+		while(usableEdges.isEmpty() == false){
+			Edge currentEdge = usableEdges.poll();
+			Node targetNode = currentEdge.dest;
+
+			if( visited[targetNode.index] == true){
 				continue;
 			}
 
-			visited[current.row][current.col] = true;
-			distance[current.row][current.col] = current.depth - 1;
+			visited[targetNode.index] = true;
+			spanningTree[mstIndex++] = currentEdge;
 
-			bfsQueue.add(new State(current.row + 1, current.col, current.depth + 1));
-			bfsQueue.add(new State(current.row - 1, current.col, current.depth + 1));
-			bfsQueue.add(new State(current.row, current.col + 1, current.depth + 1));
-			bfsQueue.add(new State(current.row, current.col - 1, current.depth + 1));
+			for(Edge e : targetNode.edges){
+				Node nextNode = e.dest;
+				if( visited[nextNode.index ] == true){
+					continue;
+				}
+
+				usableEdges.add(e);
+			}
 		}
 
-		if(visited[destR][destC] == false){
-			return -1;
-		}
-		return distance[destR][destC];
+		return spanningTree;
 	}
 
 	public static void main(String[] args) throws Exception {
-		int R = scanner.nextInt();
-		int C = scanner.nextInt();
+		int V = scanner.nextInt();
+		int E = scanner.nextInt();
 
-		int originR = -1;
-		int originC = -1;
-		int destR = -1;
-		int destC = -1;
-
-		boolean[][] passable = new boolean[R + 2][C + 2];
-
-		for (int i = 1; i <= R; i += 1) {
-			String line = scanner.next();
-			for (int j = 1; j <= C; j += 1) {
-				char c = line.charAt(j - 1);
-				if (c != '#') {
-					passable[i][j] = true;
-				}
-				if (c == 'S') {
-					originR = i;
-					originC = j;
-				} else if (c == 'E') {
-					destR = i;
-					destC = j;
-				}
-			}
+		Node[] nodes = new Node[V+1];
+		for(int i = 1; i <= V; i += 1){
+			nodes[i] = new Node(i);
 		}
 
-		int answer = getShortestPathLength(originR, originC, destR, destC, R, C, passable);
+		for(int i = 0 ; i < E; i += 1){
+			int u = scanner.nextInt();
+			int v = scanner.nextInt();
+			int w = scanner.nextInt();
 
-		System.out.println(answer);
+			nodes[u].edges.add( new Edge( nodes[u], nodes[v], w ) );
+			nodes[v].edges.add( new Edge( nodes[v], nodes[u], w ) );
+
+		}
+
+		Edge[] spanningTree = getMinimumSpanningTree(V, E, nodes);
+
+		long weightSum = 0;
+		for(Edge e : spanningTree){
+			weightSum += e.weight;
+		}
+
+		System.out.println(weightSum);
 	}
 
 }
 
-class State {
-	public final int row;
-	public final int col;
-	public final int depth;
+class Node{
+	public final int index;
+	public final ArrayList<Edge> edges;
+	public Node(int index){
+		this.index = index;
+		this.edges = new ArrayList<>();
+	}
+}
 
-	public State(int row, int col, int depth) {
-		this.row = row;
-		this.col = col;
-		this.depth = depth;
+class Edge implements Comparable<Edge>{
+	public final Node origin;
+	public final Node dest;
+	public final int weight;
+
+	public Edge(Node origin, Node dest, int weight){
+		this.origin = origin;
+		this.dest = dest;
+		this.weight = weight;
+	}
+
+	@Override
+	public int compareTo(Edge other) {
+		return this.weight - other.weight;
 	}
 }

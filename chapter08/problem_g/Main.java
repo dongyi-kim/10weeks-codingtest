@@ -5,100 +5,114 @@ import java.util.*;
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
+	public static final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
 
-	public static final int EMPTY = -1;
-	public static final int UNRIPE = 0;
-	public static final int RIPE = 1;
+	public static int[] computeShortestPaths(Node[] nodes, Node origin) {
 
-	public static int getMinimumRequiredDays(int R, int C, int[][] tomato){
-		boolean[][] visited = new boolean[R+2][C+2];
-		int[][] distance = new int[R+2][C+2];
+		PriorityQueue<State> bfsQueue = new PriorityQueue<>();
+		State initialState = new State(origin, 0);
+		bfsQueue.add(initialState);
 
-		Queue<State> bfsQueue = new LinkedList<>();
-		for(int i = 1; i <= R; i += 1){
-			for(int j = 1; j <= C; j += 1) {
-				if(tomato[i][j] == RIPE){
-					State state = new State(i, j, 1);
-					bfsQueue.add(state);
-				}
-			}
-		}
 
-		while(!bfsQueue.isEmpty()){
+		boolean[] visited = new boolean[nodes.length];
+		int[] distance = new int[nodes.length];
+		Arrays.fill(distance, Integer.MAX_VALUE);
+
+		while(bfsQueue.isEmpty() == false){
 			State current = bfsQueue.poll();
+			Node currentNode = current.currentNode;
 
-			if(current.row < 1 || current.col < 1 || current.row > R || current.col > C){
-				continue;
-			}else if(visited[current.row][current.col] == true){
-				continue;
-			}
-
-			if (tomato[current.row][current.col] == EMPTY) {
+			if( visited[currentNode.index] == true ){
 				continue;
 			}
 
-			visited[current.row][current.col] = true;
-			distance[current.row][current.col] = current.depth - 1;
+			visited[currentNode.index] = true;
+			distance[currentNode.index] = current.totalWeight;
 
-			bfsQueue.add(new State(current.row + 1, current.col, current.depth + 1));
-			bfsQueue.add(new State(current.row - 1, current.col, current.depth + 1));
-			bfsQueue.add(new State(current.row, current.col + 1, current.depth + 1));
-			bfsQueue.add(new State(current.row, current.col - 1, current.depth + 1));
-		}
-
-
-		int unripeCount = 0;
-		int requiredDays = 0;
-		for(int i = 1; i <= R; i += 1){
-			for(int j = 1; j <= C; j += 1){
-				if(tomato[i][j] == EMPTY){
+			for(Edge e : currentNode.edges){
+				Node nextNode = e.dest;
+				if(visited[nextNode.index] == true){
 					continue;
 				}
-				if(visited[i][j] == false){
-					unripeCount += 1;
-					break;
-				}else{ // tomato[i][j] == RIPE
-					requiredDays = Math.max(requiredDays, distance[i][j]);
-				}
+
+				int nextTotalWeight = current.totalWeight + e.weight;
+
+				State nextState = new State(nextNode, nextTotalWeight);
+
+				bfsQueue.add( nextState );
 			}
 		}
 
-		if(unripeCount >= 1){
-			return -1;
-		}else{
-			return requiredDays;
-		}
+		return distance;
 	}
 
 	public static void main(String[] args) throws Exception {
-		int C = scanner.nextInt();
-		int R = scanner.nextInt();
+		int V = scanner.nextInt();
+		int E = scanner.nextInt();
+		int origin = scanner.nextInt();
 
-		int[][] tomato = new int[R+2][C+2];
-		for(int i = 0 ; i < R + 2 ; i += 1){
-			Arrays.fill(tomato[i], EMPTY);
+		Node[] nodes = new Node[V+1];
+		for(int i = 1; i <= V; i+= 1){
+			nodes[i] = new Node(i);
 		}
 
-		for(int i = 1; i <= R; i += 1){
-			for(int j = 1; j <= C ; j += 1){
-				tomato[i][j] = scanner.nextInt();
+		for(int i = 0 ; i < E; i += 1){
+			int u = scanner.nextInt();
+			int v = scanner.nextInt();
+			int w = scanner.nextInt();
+			Edge e = new Edge(nodes[u], nodes[v], w);
+			nodes[u].edges.add(e);
+		}
+
+		int[] distances = computeShortestPaths(nodes, nodes[origin]);
+
+		for(int i = 1; i <= V; i+= 1){
+			if(distances[i] == Integer.MAX_VALUE){
+				writer.write("INF\n");
+			}else{
+				writer.write(String.format("%d\n", distances[i]));
 			}
 		}
-
-		int answer = getMinimumRequiredDays(R, C, tomato);
-
-		System.out.println(answer);
+		writer.flush();
+		writer.close();
 	}
 
 }
-class State {
-	public final int row;
-	public final int col;
-	public final int depth;
 
-	public State(int row, int col, int depth) {
-		this.row = row;
-		this.col = col;
-		this.depth = depth;
+
+class Node{
+	public final int index;
+	public final ArrayList<Edge> edges;
+
+	public Node(int index){
+		this.index = index;
+		this.edges = new ArrayList<Edge>();
+	}
+}
+
+class Edge{
+	public final Node origin;
+	public final Node dest;
+	public final int weight;
+
+	public Edge(Node origin, Node dest, int weight){
+		this.origin = origin;
+		this.dest = dest;
+		this.weight = weight;
+	}
+}
+
+class State implements Comparable<State>{
+	public final Node currentNode;
+	public final int totalWeight;
+
+	public State(Node currentNode, int totalWeight){
+		this.currentNode = currentNode;
+		this.totalWeight = totalWeight;
+	}
+
+	@Override
+	public int compareTo(State other) {
+		return this.totalWeight - other.totalWeight;
 	}
 }

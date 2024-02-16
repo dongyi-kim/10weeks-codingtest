@@ -1,84 +1,67 @@
 import java.io.*;
-import java.lang.*;
 import java.util.*;
-
+import java.lang.*;
 
 public class Main {
+
 	public static final Scanner scanner = new Scanner(System.in);
 
-	public static boolean hasHamiltonPath(Graph graph){
-		boolean[] visited = new boolean[graph.V+1];
-		for(int originNode = 1; originNode <= graph.V; originNode += 1){
-			boolean has = hasHamiltonPath(1, originNode, visited, graph);
-			if(has){
-				return true;
-			}
+	public static void main(String[] args) {
+		int n = scanner.nextInt();
+		int[] arr = new int[n];
+		for (int i = 0; i < n; i += 1) {
+			arr[i] = scanner.nextInt();
 		}
-		return false;
+
+		LIS lis = new LIS(arr);
+		int answer = 0;
+		for (int i = 0; i < n; i += 1) {
+			answer = Math.max(answer, lis.f(i));
+		}
+
+		System.out.println(answer);
 	}
-
-	public static boolean hasHamiltonPath(int depth, int currentNode, boolean[] visited, Graph graph) {
-		if(visited[currentNode]){
-			return false;
-		}
-		visited[currentNode] = true;
-
-		boolean hasPath = false;
-		if(depth == graph.V){
-			hasPath = true;
-		}else{
-			for(int nextNode = 1; nextNode <= graph.V; nextNode += 1) {
-				hasPath = hasHamiltonPath(depth+1, nextNode, visited, graph);
-				if(hasPath){
-					break;
-				}
-			}
-		}
-
-		visited[currentNode] = false;
-
-		return hasPath;
-	}
-
-	public static void main(String[] args) throws Exception {
-		int V = scanner.nextInt();
-		int E =scanner.nextInt();
-
-		Graph graph = new Graph(V);
-		for(int i = 0 ; i < E ; i += 1){
-			int u = scanner.nextInt();
-			int v = scanner.nextInt();
-			graph.addEdge(u, v);
-		}
-
-		boolean hasPath = hasHamiltonPath(graph);
-
-		if(hasPath){
-			System.out.println("YES");
-		}else{
-			System.out.println("NO");
-		}
-	}
-
 }
 
+class LIS {
+	private static final int EMPTY = -1;
 
-class Graph{
-	private boolean[][] adj;
-	public final int V;
+	private int[] memo;         // DP 상태공간
+	private int[] array;        // 수열의 원소
+	private int n;              // 수열의 길이
 
-	public Graph(int V){
-		this.adj = new boolean[V+1][V+1];
-		this.V = V;
+	public LIS(int[] array) {
+		this.array = array.clone();
+		this.n = array.length;
+		this.memo = new int[n];
+		Arrays.fill(memo, EMPTY);
 	}
 
-	public void addEdge(int u, int v){
-		adj[u][v] = adj[v][u] = true;
+	/**
+	 * array[lastIndex]가 마지막 원소인 모든 LIS 길이를 계산하는 함수
+	 *
+	 * @param lastIndex 부분 수열의 마지막 원소의 인덱스
+	 * @return array[lastIndex]가 마지막 원소인 LIS의 길이
+	 */
+	public int f(int lastIndex) {
+		if (lastIndex < 0) {
+			// 예외인 경우는 길이 0으로 취급한다.
+			return 0;
+		} else if (memo[lastIndex] != EMPTY) {
+			// 이미 계산된 적 있는 결과라면 반환한다.
+			return memo[lastIndex];
+		} else if (lastIndex == 0) {
+			return 1;
+		}
+
+		int answer = 1;
+		for (int previousIndex = 0; previousIndex < lastIndex; previousIndex += 1) {
+			int newLength = f(previousIndex) + 1;
+			if (array[previousIndex] < array[lastIndex] && newLength > answer) {
+				answer = newLength;
+			}
+		}
+		memo[lastIndex] = answer;
+		return memo[lastIndex];
 	}
-
-	public boolean hasEdge(int u, int v){
-		return adj[u][v];
-	}
-
-
 }

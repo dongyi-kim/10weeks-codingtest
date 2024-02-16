@@ -4,98 +4,65 @@
 
 using namespace std;
 
-class DisjointSet {
+
+class RangeSum {
 public:
-	int size;
-	vector<int> groupBoss;
-	vector<int> groupSize;
+	vector<vector<int> > memo;
+	vector<vector<int> > values;
+	int n;
 
-	DisjointSet(int size) {
-		this->size = size;
-		this->groupBoss = vector<int>(size + 1);
-		for (int nodeIndex = 1; nodeIndex <= size; nodeIndex += 1) {
-			groupBoss[nodeIndex] = nodeIndex;
-		}
+	RangeSum(vector<vector<int> > values) {
+		this->n = values.size();
+		this->values = values;
+		this->memo = vector<vector<int> >(this->n, vector<int>(this->n, -1));
 	}
 
-	int getGroupBoss(int u) {
-		if (groupBoss[u] == u) {
-			return u;
-		} else {
-			groupBoss[u] = getGroupBoss(groupBoss[u]);
-			return groupBoss[u];
+	/**
+	 * values[0][0] ~ values[lastRow][lastCol] 까지의 직사각형 누적합을 계산하는 함수
+	 *
+	 * @param lastRow 마지막 행 번호
+	 * @param lastCol 마지막 열 번호
+	 * @return 해당 범위의 누적합
+	 */
+	int f(int lastRow, int lastCol) {
+		if (lastCol < 0 || lastRow < 0) {
+			return 0;
+		} else if (memo[lastRow][lastCol] != -1) {
+			return memo[lastRow][lastCol];
+		} else if (lastRow == 0 && lastCol == 0) {
+			return values[0][0];
 		}
-	}
 
-	void unionGroup(int u, int v) {
-		int uBoss = getGroupBoss(u);
-		int vBoss = getGroupBoss(v);
-		if(uBoss == vBoss) {
-			return;
-		}
-		groupBoss[vBoss] = uBoss;		
+		memo[lastRow][lastCol] = values[lastRow][lastCol] + f(lastRow - 1, lastCol) + f(lastRow, lastCol - 1) - f(lastRow - 1, lastCol - 1);
+
+		return memo[lastRow][lastCol];
 	}
 };
-
-class Edge {
-public:
-	int nodeU;
-	int nodeV;
-	int weight;
-
-	Edge(int nodeU, int nodeV, int weight) {
-		this->nodeU = nodeU;
-		this->nodeV = nodeV;
-		this->weight = weight;
-	}
-
-	bool operator < (const Edge& other) const {
-		return this->weight < other.weight;
-	}
-};
-
-vector<Edge> getMinimumSpanningTree(int V, int E, vector<Edge>& edges) {
-	vector<Edge> spanningTree;
-
-	// 빈 그래프 G에 대한 disjointSet을 선언한다
-	DisjointSet disjointSet(V);
-
-	// 간선들을 오름차순으로 정렬한다
-	sort(edges.begin(), edges.end());
-
-	for (int i = 0; i < E; i += 1) {
-		const Edge& edge = edges[i];
-
-		if(disjointSet.getGroupBoss(edge.nodeU) == disjointSet.getGroupBoss(edge.nodeV)) {
-			// 이미 해당 두 정점이 연결성이 존재한다면 이 간선은 무시한다.
-			continue;
-		} else {
-			// 그렇지 않다면 이 간선을 그래프 G에 추가한다.
-			spanningTree.push_back(edge);
-			disjointSet.unionGroup(edge.nodeU, edge.nodeV);
-		}
-	}
-
-	return spanningTree;
-}
 
 int main() {
-	int V, E;
-	scanf("%d%d", &V, &E);
+	int n, m;
+	scanf("%d%d", &n, &m);
 
-	vector<Edge> edges;
-	for(int i = 0 ; i < E; i += 1){
-		int u, v, w;
-		scanf("%d%d%d", &u, &v, &w);
-		edges.push_back(Edge(u, v, w));
+	vector<vector<int> > values(n, vector<int>(n));
+	for (int i = 0; i < n; i += 1) {
+		for (int j = 0; j < n; j += 1) {
+			scanf("%d", &values[i][j]);
+		}
 	}
 
-	vector<Edge> spanningTree = getMinimumSpanningTree(V, E, edges);
+	RangeSum rangeSum(values);
 
-	long long weightSum = 0;
-	for (int i = 0; i < spanningTree.size(); i += 1) {
-		weightSum += spanningTree[i].weight;
+	for (int i = 0; i < m; i += 1) {
+		int minRow, minCol, maxRow, maxCol;
+		scanf("%d%d%d%d", &minRow, &minCol, &maxRow, &maxCol);
+		minRow -= 1; minCol -= 1; maxRow -= 1; maxCol -= 1;
+
+		int sum = 0;
+		sum += rangeSum.f(maxRow, maxCol);
+		sum -= rangeSum.f(maxRow, minCol - 1);
+		sum -= rangeSum.f(minRow - 1, maxCol);
+		sum += rangeSum.f(minRow - 1, maxCol - 1);
+
+		printf("%d\n", sum);
 	}
-
-	printf("%lld\n", weightSum);
 }

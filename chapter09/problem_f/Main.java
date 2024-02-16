@@ -1,102 +1,101 @@
-import java.lang.*;
+import java.io.*;
 import java.util.*;
+import java.lang.*;
 
 
 public class Main {
 	public static final Scanner scanner = new Scanner(System.in);
 
-	public static Edge[] getMinimumSpanningTree(int V, int E, Node[] nodes){
-
-		int mstIndex = 0;
-		Edge[] spanningTree = new Edge[V-1];
-
-		int origin = 1;
-
-		PriorityQueue<Edge> usableEdges = new PriorityQueue<>();
-		for(Edge e : nodes[origin].edges){
-			usableEdges.add(e);
-		}
-
-		boolean[] visited = new boolean[V+1];
-		visited[origin] = true;
-
-		while(usableEdges.isEmpty() == false){
-			Edge currentEdge = usableEdges.poll();
-			Node targetNode = currentEdge.dest;
-
-			if( visited[targetNode.index] == true){
-				continue;
-			}
-
-			visited[targetNode.index] = true;
-			spanningTree[mstIndex++] = currentEdge;
-
-			for(Edge e : targetNode.edges){
-				Node nextNode = e.dest;
-				if( visited[nextNode.index ] == true){
-					continue;
-				}
-
-				usableEdges.add(e);
+	public static int[][] nextImage(int r, int c) {
+		int[][] img = new int[r][c];
+		for (int i = 0; i < r; i += 1) {
+			for (int j = 0; j < c; j += 1) {
+				img[i][j] = scanner.nextInt();
 			}
 		}
-
-		return spanningTree;
+		return img;
 	}
 
-	public static void main(String[] args) throws Exception {
-		int V = scanner.nextInt();
-		int E = scanner.nextInt();
+	public static void main(String[] args) {
+		int r = scanner.nextInt();
+		int c = scanner.nextInt();
+		int[][] imgA = nextImage(r, c);
+		int[][] imgB = nextImage(r, c);
 
-		Node[] nodes = new Node[V+1];
-		for(int i = 1; i <= V; i += 1){
-			nodes[i] = new Node(i);
-		}
 
-		for(int i = 0 ; i < E; i += 1){
-			int u = scanner.nextInt();
-			int v = scanner.nextInt();
-			int w = scanner.nextInt();
+		Quilting quilting = new Quilting(r, c, imgA, imgB);
 
-			nodes[u].edges.add( new Edge( nodes[u], nodes[v], w ) );
-			nodes[v].edges.add( new Edge( nodes[v], nodes[u], w ) );
+		int answer = quilting.f(r - 1, c - 1);
 
-		}
-
-		Edge[] spanningTree = getMinimumSpanningTree(V, E, nodes);
-
-		long weightSum = 0;
-		for(Edge e : spanningTree){
-			weightSum += e.weight;
-		}
-
-		System.out.println(weightSum);
-	}
-
-}
-
-class Node{
-	public final int index;
-	public final ArrayList<Edge> edges;
-	public Node(int index){
-		this.index = index;
-		this.edges = new ArrayList<>();
+		System.out.println(answer);
 	}
 }
 
-class Edge implements Comparable<Edge>{
-	public final Node origin;
-	public final Node dest;
-	public final int weight;
+class Quilting {
+	private static int EMPTY = -1;
+	private static int INFINITY = 1000000000;
 
-	public Edge(Node origin, Node dest, int weight){
-		this.origin = origin;
-		this.dest = dest;
-		this.weight = weight;
+	private int[][] imageA;
+	private int[][] imageB;
+	private int[][] memo;
+	private int r;
+	private int c;
+
+	public Quilting(int r, int c, int[][] imageA, int[][] imageB) {
+		this.r = r;
+		this.c = c;
+		this.memo = new int[r][c];
+		this.imageA = new int[r][c];
+		this.imageB = new int[r][c];
+		for (int i = 0; i < r; i += 1) {
+			for (int j = 0; j < c; j += 1) {
+				memo[i][j] = EMPTY;
+				this.imageA[i][j] = imageA[i][j];
+				this.imageB[i][j] = imageB[i][j];
+			}
+		}
 	}
 
-	@Override
-	public int compareTo(Edge other) {
-		return this.weight - other.weight;
+	/**
+	 * 현재 0번째 행부터 이어온 경계선의 마지막이 (lastRow, lastCol)일 때 최소의 부자연스러움 수치를 계산하는 함수
+	 *
+	 * @param lastRow 경계선 마지막 행
+	 * @param lastCol 경계선 마지막 열
+	 * @return 이때의 최소 부자연스러움
+	 */
+	public int f(int lastRow, int lastCol) {
+		if (lastRow < 0 || lastCol < 0 || lastCol >= c) {
+			return INFINITY;
+		} else if (memo[lastRow][lastCol] != EMPTY) {
+			return memo[lastRow][lastCol];
+		} else if (lastRow == 0) {
+			// 마지막 행인 경우 해당 칸의 픽셀 차이만 비교한다
+			int diff = imageA[lastRow][lastCol] - imageB[lastRow][lastCol];
+			return diff * diff;
+		}
+
+		// 일단 현재 픽셀의 차이값을 계산한다
+		int diff = imageA[lastRow][lastCol] - imageB[lastRow][lastCol];
+		int error = diff * diff;
+
+		// 이전 행 까지의 세가지 경우의 수중 최적해와 더한다
+		int answer = error + MIN(
+				f(lastRow - 1, lastCol - 1),
+				f(lastRow - 1, lastCol),
+				f(lastRow - 1, lastCol + 1)
+		);
+
+		memo[lastRow][lastCol] = answer;
+		return answer;
+	}
+
+
+	public static int MIN(int... arr) {
+		int min = arr[0];
+		for (int i = 0; i < arr.length; i += 1) {
+			min = Math.min(min, arr[i]);
+		}
+		return min;
 	}
 }
+

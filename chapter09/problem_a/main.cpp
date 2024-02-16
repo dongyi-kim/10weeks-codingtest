@@ -1,75 +1,67 @@
 #include <cstdio>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
-class Graph{
+
+class LIS {
 public:
-	vector<vector<bool> > adj;
-	int V;
+	vector<int> memo;         // DP 상태공간
+	vector<int> array;        // 수열의 원소
+	int n;              // 수열의 길이
 
-	Graph(int V) {
-		this->adj = vector<vector<bool> >(V + 1, vector<bool>(V + 1, false));
-		this->V = V;
+	LIS(vector<int> array) {
+		this->array = array;
+		this->n = array.size();
+		this->memo.assign(n, -1);
 	}
 
-	void addEdge(int u, int v){
-		adj[u][v] = adj[v][u] = true;
-	}
+	/**
+	 * array[lastIndex]가 마지막 원소인 모든 LIS 길이를 계산하는 함수
+	 *
+	 * @param lastIndex 부분 수열의 마지막 원소의 인덱스
+	 * @return array[lastIndex]가 마지막 원소인 LIS의 길이
+	 */
+	int f(int lastIndex) {
+		if (lastIndex < 0) {
+			// 예외인 경우는 길이 0으로 취급한다.
+			return 0;
+		} else if (memo[lastIndex] != -1) {
+			// 이미 계산된 적 있는 결과라면 반환한다.
+			return memo[lastIndex];
+		} else if (lastIndex == 0) {
+			return 1;
+		}
 
-	bool hasEdge(int u, int v){
-		return adj[u][v];
+		int answer = 1;
+
+		for (int previousIndex = 0; previousIndex < lastIndex; previousIndex += 1) {
+			int newLength = this->f(previousIndex) + 1;
+			if (array[previousIndex] < array[lastIndex] && newLength > answer) {
+				answer = newLength;
+			}
+		}
+		
+		memo[lastIndex] = answer;
+		return memo[lastIndex];
 	}
 };
 
-bool hasHamiltonPath(int depth, int currentNode, vector<bool>& visited, const Graph& graph) {
-	if(visited[currentNode]) {
-		return false;
-	}
-	visited[currentNode] = true;
-
-	bool hasPath = false;
-	if(depth == graph.V) {
-		hasPath = true;
-	} else {
-		for(int nextNode = 1; nextNode <= graph.V; nextNode += 1) {
-			hasPath = hasHamiltonPath(depth + 1, nextNode, visited, graph);
-			if(hasPath) {
-				break;
-			}
-		}
-	}
-
-	visited[currentNode] = false;
-
-	return hasPath;
-}
-
-
-bool hasHamiltonPath(const Graph& graph) {
-	vector<bool> visited(graph.V + 1, false);
-	for(int originNode = 1; originNode <= graph.V; originNode += 1) {
-		if(hasHamiltonPath(1, originNode, visited, graph)){
-			return true;
-		}
-	}
-	return false;
-}
-
 int main() {
-	int V, E;
-	scanf("%d%d", &V, &E);
+	int n;
+	scanf("%d", &n);
 
-	Graph graph(V);
-	for(int i = 0 ; i < E ; i += 1){
-		int u, v;
-		scanf("%d%d", &u, &v);
-		graph.addEdge(u, v);
+	vector<int> arr(n);
+	for (int i = 0; i < n; i += 1) {
+		scanf("%d", &arr[i]);
 	}
 
-	if(hasHamiltonPath(graph)) {
-		puts("YES");
-	} else {
-		puts("NO");
+	LIS lis(arr);
+	int answer = 0;
+	for (int i = 0; i < n; i += 1) {
+		answer = max(answer, lis.f(i));
 	}
+
+	printf("%d\n", answer);
 }
