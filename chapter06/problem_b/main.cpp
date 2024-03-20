@@ -3,13 +3,14 @@
 
 using namespace std;
 
-
-class Disk {
+class Disk
+{
 public:
-	int height;
+	int size;
 
-	Disk(int height) {
-		this->height = height;
+	Disk(int size)
+	{
+		this->size = size;
 	}
 };
 
@@ -23,11 +24,15 @@ public:
  * @param to        원반들을 모두 옮길 기둥
  * @return          모든 원반을 옮길 수 있는 최소 이동 횟수
  */
-int getMinimumMove(int num, stack<Disk>& from, stack<Disk>& buffer, stack<Disk>& to) {
-	if (num == 0) {
+int getMinimumMove(int num, stack<Disk> &from, stack<Disk> &buffer, stack<Disk> &to)
+{
+	if (num == 0)
+	{
 		// 원판이 없다면 당연히 아무 이동도 필요하지 않다
 		return 0;
-	} else if(num == 1) {
+	}
+	else if (num == 1)
+	{
 		// 원판이 하나 뿐이라면 그냥 이동하면 된다
 		Disk d = from.top();
 		from.pop();
@@ -49,7 +54,8 @@ int getMinimumMove(int num, stack<Disk>& from, stack<Disk>& buffer, stack<Disk>&
 	return move;
 }
 
-int main() {
+int main()
+{
 	int N;
 	scanf("%d", &N);
 
@@ -58,7 +64,8 @@ int main() {
 	stack<Disk> C;
 
 	// 첫 번째 기둥에 N개의 원판을 쌓는다
-	for (int i = N; i >= 1; i -= 1) {
+	for (int i = N; i >= 1; i -= 1)
+	{
 		Disk d(i);
 		A.push(d);
 	}

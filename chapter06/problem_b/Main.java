@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.*;
 import java.lang.*;
 
@@ -61,9 +60,9 @@ public class Main {
 
 
 class Disk {
-	final int height;
+	final int size;
 
-	public Disk(int height) {
-		this.height = height;
+	public Disk(int size) {
+		this.size = size;
 	}
 }
