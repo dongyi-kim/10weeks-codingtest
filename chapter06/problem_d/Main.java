@@ -19,15 +19,14 @@ public class Main {
 	public static void findAllCombinations(int depth, int limit, ArrayList<Integer> selectedIndex) throws Exception {
 		// depth가 제한보다 커진 경우, limit개 만큼의 문자를 모두 선택했다는 뜻이다
 		if (depth > limit) {
-			// 선택한 문자들을 차례로 한 줄에 출력한다
-			for (int i = 1; i < depth; i += 1) {
-				int index = selectedIndex.get(i - 1);
-				char c = ITEMS[index];
-				writer.write(String.valueOf(c));
+			// 선택한 문자들을 차례로 한 줄의 스트링으로 만든다
+			StringBuilder builder = new StringBuilder();
+			for(int index : selectedIndex){
+				builder.append(ITEMS[index]);
 			}
-
-			// 줄을 바꾸어 준다
-			writer.write("\n");
+			
+			// 출력해준다
+			writer.write(builder.toString() + "\n");
 
 			// 이제 종료한다
 			return;
